@@ -1,21 +1,18 @@
 
 import React, { useState } from 'react'
+import CodeBlock from './CodeBlock' // ← add this import
+import ChatPreview from './ChatPreviews'
 
 const Hero: React.FC = () => {
   const [tab, setTab] = useState<'chat' | 'code'>('chat')
   const PY_SNIPPET = `# pseudo-code example
-from aethergraph import graph_fun, channel, artifacts, memory
-
 @graph_fun(name="analyze_csv")
 def analyze_csv(path: str, column: str):
     df = load_csv(path)
     fig = plot_hist(df[column])
     art_id = artifacts.save(fig, name=f"hist_{column}")  # explicit save
-    memory.note(f"Plotted {column} from {path}", artifact=art_id)
     return {"artifact_id": art_id, "message": "Chart ready"}
-
-# run from a channel (Slack/CLI)
-channel("slack").send("analyze_csv", path="data.csv", column="mtf50")`;
+`;
 
   return (
     <section className="relative overflow-hidden">
@@ -49,24 +46,10 @@ channel("slack").send("analyze_csv", path="data.csv", column="mtf50")`;
             </div>
             <div className="glass rounded-2xl border border-white/60 shadow-soft p-5 md:p-6">
               {tab === 'chat' ? (
-                <div className="bg-slate-900 rounded-xl p-4 text-white text-sm font-mono">
-                  <div className="opacity-80">$ slack · #aether-lab</div>
-                  <div className="mt-3 space-y-3">
-                    <div><span className="text-brand">You</span>: plot MTF50 from latest run</div>
-                    <div><span className="text-emerald-300">Helper</span>: proposed code ▶ run?</div>
-                    <div className="flex items-center gap-2">
-                      <button className="px-2 py-1 rounded bg-emerald-500/20">Approve</button>
-                      <button className="px-2 py-1 rounded bg-slate-700">Edit</button>
-                    </div>
-                    <div className="mt-3">progress ▓▓▓▓▓▓░░░░ 50%</div>
-                    <div className="mt-3">artifact saved: <span className="text-brand">mtf50_plot@2025‑10‑20</span></div>
-                    <div className="mt-2">summary (draft): cites <span className="text-slate-300">artifact#mtf50_plot@2025‑10‑20</span></div>
-                  </div>
-                </div>
+                <ChatPreview />
               ) : (
                 <div className="bg-slate-900 rounded-xl p-4 text-slate-100 text-sm font-mono overflow-auto">
-                  <pre><code>{PY_SNIPPET}</code></pre>
-
+                  <CodeBlock code={PY_SNIPPET} language="python" title="analyze_csv.py" />
                 </div>
               )}
             </div>
