@@ -1,0 +1,13 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container-max { max-width: 1120px; }
+.glass { backdrop-filter: saturate(180%) blur(10px); background: rgba(255,255,255,0.6); }
+.tag { font-size: 0.725rem; }
+.aeg-card { position: relative; border-radius: 1rem; background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%); border: 1px solid rgba(15, 23, 42, 0.08); box-shadow: 0 10px 30px rgba(2,6,23,.06); }
+.aeg-card::after{ content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(180deg, rgba(46,144,255,.35), rgba(255,138,61,.2)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.icon-2d { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+.icon-2d-lg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+.bg-grid { background-image: theme('backgroundImage.grid'); background-size: 22px 22px; }
