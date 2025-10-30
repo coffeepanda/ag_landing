@@ -7,9 +7,18 @@ type Props = {
   language?: "python" | "tsx" | "ts" | "bash" | "json" | string
   title?: string
   wrap?: boolean
+  fullHeight?: boolean
+  className?: string
 }
 
-const CodeBlock: React.FC<Props> = ({ code, language = "python", title, wrap }) => {
+const CodeBlock: React.FC<Props> = ({
+  code,
+  language = "python",
+  title,
+  wrap,
+  fullHeight,
+  className
+}) => {
   const [copied, setCopied] = React.useState(false)
 
   async function onCopy() {
@@ -21,7 +30,8 @@ const CodeBlock: React.FC<Props> = ({ code, language = "python", title, wrap }) 
   }
 
   return (
-    <div className="rounded-xl overflow-hidden shadow-soft border border-slate-800/40 bg-slate-900">
+    <div className={`rounded-xl overflow-hidden shadow-soft border border-slate-800/40 bg-slate-900 ${fullHeight ? 'h-full flex flex-col' : ''} ${className ?? ''}`}>
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800/60 bg-slate-900/70">
         <div className="flex items-center gap-2 text-slate-300 text-xs">
           <span className="inline-block w-2 h-2 rounded-full bg-red-500/70" />
@@ -37,16 +47,25 @@ const CodeBlock: React.FC<Props> = ({ code, language = "python", title, wrap }) 
         </button>
       </div>
 
-      <SyntaxHighlighter
-        language={language}
-        style={vscDarkPlus}
-        showLineNumbers
-        wrapLongLines={!!wrap}
-        customStyle={{ margin: 0, background: "transparent", fontSize: "0.9rem", padding: "12px 16px" }}
-        lineNumberStyle={{ color: "#64748b", marginRight: "16px" }}
-      >
-        {code.trimEnd()}
-      </SyntaxHighlighter>
+      {/* Content */}
+      <div className={`min-h-0 ${fullHeight ? 'flex-1 overflow-auto' : ''}`}>
+        <SyntaxHighlighter
+          language={language}
+          style={vscDarkPlus}
+          showLineNumbers
+          wrapLongLines={!!wrap}
+          customStyle={{
+            margin: 0,
+            background: "transparent",
+            fontSize: "0.9rem",
+            padding: "12px 16px",
+            ...(fullHeight ? { height: '100%' } : {}),
+          }}
+          lineNumberStyle={{ color: "#64748b", marginRight: "16px" }}
+        >
+          {code.trimEnd()}
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }

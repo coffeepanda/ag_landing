@@ -9,7 +9,7 @@ const TrafficLights = () => (
 )
 
 const Bubble: React.FC<
-  React.PropsWithChildren<{ who: "you" | "helper"; meta?: string }>
+  React.PropsWithChildren<{ who: "you" | "Aether"; meta?: string }>
 > = ({ who, meta, children }) => {
   const isYou = who === "you"
   return (
@@ -27,11 +27,7 @@ const Bubble: React.FC<
       >
         {children}
         {meta && (
-          <div
-            className={`mt-1 text-[11px] ${
-              isYou ? "text-slate-400" : "text-slate-500"
-            }`}
-          >
+          <div className={`mt-1 text-[11px] ${isYou ? "text-slate-400" : "text-slate-500"}`}>
             {meta}
           </div>
         )}
@@ -57,15 +53,14 @@ const ProgressBar: React.FC<{ value: number }> = ({ value }) => (
 
 const ArtifactChip: React.FC<{ id: string }> = ({ id }) => (
   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] bg-slate-100 text-slate-700 border border-slate-200">
-    <svg className="w-3.5 h-3.5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+    <svg className="w-3.5 h-3.5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="5" y="4" width="14" height="16" rx="2" /><path d="M8 8h8M8 12h8M8 16h5" />
+    </svg>
     {id}
   </span>
 )
 
-const ActionRow: React.FC<{
-  onApprove?: () => void
-  onEdit?: () => void
-}> = ({ onApprove, onEdit }) => (
+const ActionRow: React.FC<{ onApprove?: () => void; onEdit?: () => void }> = ({ onApprove, onEdit }) => (
   <div className="flex items-center gap-2 mt-2">
     <button
       onClick={onApprove}
@@ -83,37 +78,38 @@ const ActionRow: React.FC<{
 )
 
 /** Polished chat preview matching the site’s glass + token styles */
-const ChatPreview: React.FC = () => {
+const ChatPreview: React.FC<{ className?: string }> = ({ className }) => {
   return (
-    <div className="aeg-card p-0 overflow-hidden">
+    <div className={`aeg-card p-0 overflow-hidden relative h-full flex flex-col ${className ?? ''}`}>
+      {/* Watermark */}
       <div className="pointer-events-none absolute inset-0 grid place-items-center">
-    <div className="select-none rotate-[-18deg] text-slate-400/10 text-5xl font-extrabold tracking-widest">
-      MOCK UI
-    </div>
-  </div>
+        <div className="select-none rotate-[-18deg] text-slate-400/10 text-5xl font-extrabold tracking-widest">
+          MOCK UI
+        </div>
+      </div>
+
       {/* Title bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-white/70 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <TrafficLights />
           <div className="text-xs text-slate-600">
-<span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[11px] border border-amber-200">
- AetherGraph Agent
-</span>
+            <span className="px-2 py-0.5 rounded-md bg-white/100 text-slate-900 text-[11px] border border-slate-200">
+              AetherGraph Agent
+            </span>
           </div>
         </div>
-        <span className="text-[11px] text-slate-500">live preview</span>
       </div>
 
-      {/* Transcript */}
-      <div className="bg-slate-50/60 p-4 md:p-5 space-y-3">
+      {/* Transcript (scrolls) */}
+      <div className="bg-slate-50/60 p-4 md:p-5 space-y-3 flex-1 overflow-auto">
         <Bubble who="you" meta="now">
           <span className="font-semibold text-brand">You:</span>{" "}
           plot MTF50 from latest run
         </Bubble>
 
-        <Bubble who="helper" meta="draft plan · 2 steps">
+        <Bubble who="Aether" meta="draft plan · 2 steps">
           <div className="text-slate-800">
-            <span className="font-semibold text-emerald-700">Helper:</span>{" "}
+            <span className="font-semibold text-emerald-700">Aether:</span>{" "}
             proposed code → run?
           </div>
           <div className="mt-2 rounded-lg border border-slate-200 bg-white p-2 text-[12px] font-mono text-slate-800">
@@ -122,10 +118,12 @@ const ChatPreview: React.FC = () => {
           <ActionRow />
         </Bubble>
 
-        {/* <Bubble who="helper" meta="executing · job: mtf50-plot-2025-10-20">
+        {/* Example running state
+        <Bubble who="helper" meta="executing · job: mtf50-plot-2025-10-20">
           <div className="text-slate-800">running…</div>
           <ProgressBar value={50} />
-        </Bubble> */}
+        </Bubble>
+        */}
 
         <Bubble who="helper" meta="completed · 3s">
           <div className="text-slate-800">
@@ -136,12 +134,14 @@ const ChatPreview: React.FC = () => {
           </div>
         </Bubble>
       </div>
+
+      {/* Footnote (non-scrolling) */}
       <div className="px-4 pb-4 md:px-5">
-    <p className="mt-2 text-[11px] text-slate-500">
-      This is a <strong>mock UI</strong> illustrating an integration. AetherGraph provides the
-      backend framework (channels, artifacts, memory, approvals). You bring Slack/CLI/web UI.
-    </p>
-  </div>
+        <p className="mt-2 text-[11px] text-slate-500">
+          This is a <strong>mock UI</strong> illustrating an integration. AetherGraph provides the
+          backend framework. You bring Slack/CLI/web UI.
+        </p>
+      </div>
     </div>
   )
 }

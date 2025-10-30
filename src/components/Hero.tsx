@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react'
-import CodeBlock from './CodeBlock' // ← add this import
-import ChatPreview from './ChatPreviews'
+import CodeBlock from './CodeBlock'
+import ChatPreview from './ChatPreview' 
 
 const Hero: React.FC = () => {
   const [tab, setTab] = useState<'chat' | 'code'>('chat')
+
   const PY_SNIPPET = `# pseudo-code example
 @graph_fun(name="analyze_csv")
 def analyze_csv(path: str, column: str):
@@ -12,7 +12,7 @@ def analyze_csv(path: str, column: str):
     fig = plot_hist(df[column])
     art_id = artifacts.save(fig, name=f"hist_{column}")  # explicit save
     return {"artifact_id": art_id, "message": "Chart ready"}
-`;
+`
 
   return (
     <section className="relative overflow-hidden">
@@ -37,23 +37,36 @@ def analyze_csv(path: str, column: str):
               <a href="#waitlist" className="px-5 py-3 rounded-xl bg-accent text-white font-semibold shadow-soft">Join the waitlist</a>
               <a href="#examples" className="px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-soft">See example flows</a>
             </div>
-            <p className="text-slate-500 mt-3 text-sm">Public alpha targeting <strong>mid‑November 2025</strong> (docs, demo, quickstart).</p>
+            <p className="text-slate-500 mt-3 text-sm">Public alpha targeting <strong>mid-November 2025</strong> (docs, demo, quickstart).</p>
           </div>
+
           <div className="md:pl-8">
             <div className="flex items-center gap-2 mb-3">
-              <button onClick={() => setTab('chat')} className={`px-3 py-1 rounded-lg text-sm ${tab === 'chat' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}>Chat</button>
-              <button onClick={() => setTab('code')} className={`px-3 py-1 rounded-lg text-sm ${tab === 'code' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}>Code</button>
+              <button
+                onClick={() => setTab('chat')}
+                className={`px-3 py-1 rounded-lg text-sm ${tab === 'chat' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+              >
+                Chat (mock)
+              </button>
+              <button
+                onClick={() => setTab('code')}
+                className={`px-3 py-1 rounded-lg text-sm ${tab === 'code' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+              >
+                Code
+              </button>
             </div>
-            <div className="glass rounded-2xl border border-white/60 shadow-soft p-5 md:p-6">
-              {tab === 'chat' ? (
-                <ChatPreview />
-              ) : (
-                <div className="bg-slate-900 rounded-xl p-4 text-slate-100 text-sm font-mono overflow-auto">
-                  <CodeBlock code={PY_SNIPPET} language="python" title="analyze_csv.py" />
-                </div>
-              )}
+
+            {/* Consistent, fixed height; inner content scrolls */}
+            <div className="glass rounded-2xl border border-white/60 shadow-soft p-4 sm:p-5 md:p-6">
+              <div className="h-[360px] sm:h-[420px] md:h-[480px]">
+                {tab === 'chat' ? (
+                  <ChatPreview className="h-full" />
+                ) : (
+                  <CodeBlock code={PY_SNIPPET} language="python" title="analyze_csv.py" fullHeight />
+                )}
+              </div>
+              <p className="text-slate-500 text-xs mt-2">Toggle between chat and code sketch to see how it works.</p>
             </div>
-            <p className="text-slate-500 text-xs mt-2">Toggle between chat and code to see how it works.</p>
           </div>
         </div>
       </div>

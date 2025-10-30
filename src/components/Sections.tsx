@@ -15,17 +15,48 @@ export const Examples: React.FC = () => (
   <section id="examples" className="py-24 border-t border-slate-200/60 bg-grid bg-white">
     <div className="mx-auto px-6 container-max">
       <h2 className="text-3xl md:text-4xl font-bold tracking-tight">See it in action</h2>
-      <p className="text-slate-700 mt-3 text-lg max-w-3xl">Real tasks researchers do every day—now interactive, auditable, and easy to share. Save artifacts explicitly for versioning and tracing.</p>
+      <p className="text-slate-700 mt-3 text-lg max-w-3xl">
+        Real tasks researchers and engineers do every day—now interactive, auditable, and easy to share with AI.
+        Save artifacts explicitly for versioning and traceability.
+      </p>
+
       <div className="grid md:grid-cols-2 gap-6 mt-10">
-        <Card title="Interactive analysis" icon="#icon-analysis">Ask a question → a helper proposes code → run → get a chart. Save the code and outputs as artifacts when you want to keep a versioned trail.</Card>
-        <Card title="Monitor long jobs" icon="#icon-timer">Kick off sims/opt/train; watch progress in Slack; tweak params with approvals; resume after failures.</Card>
-        <Card title="Artifact‑anchored summaries (you approve)" icon="#icon-report">Generate <span className='font-medium'>draft summaries</span> grounded in the artifacts you saved and session memory. You review/edit/approve; every claim cites artifact IDs.</Card>
-        <Card title="Governance, without friction" icon="#icon-shield">Lightweight policies for approvals, dataset logging, and provenance—when you need them.</Card>
+        <Card title="Interactive analysis" icon="#icon-analysis">
+        Ask a question → helper proposes code → run → get a chart.
+        Save code and outputs as artifacts for a clean, versioned trail.
+        </Card>
+
+        <Card title="Monitor long jobs" icon="#icon-timer">
+        Kick off simulation/optimization/training; get notified on completion or failure;
+        tweak parameters with approvals; resume after interruptions.
+        </Card>
+
+        <Card title="Summarize with memory" icon="#icon-report">
+        Generate <span className="font-medium">draft summaries</span> grounded in artifacts and RAG.
+        Every claim is traceable with clear IDs and provenance.
+        </Card>
+
+        {/* a) Agent in your workflow */}
+        <Card title="Agent in your workflow" icon="#icon-plug">
+        Drop an AetherGraph agent into existing Python workflows with minimal friction.
+        The <span className="font-medium">context</span> methods let any function become a talkable agent with memory.
+        </Card>
+
+        {/* b) Build your own copilot */}
+        <Card title="Build your own copilot" icon="#icon-bot">
+        Compose tools, approvals, memory, and channels to create a domain-specific copilot—yours,
+        not a black box. Start simple, grow as needed.
+        </Card>
+
+        {/* c) More examples… */}
+        <Card title="More examples" icon="#icon-sparkles">
+          More examples, use cases, and code patterns will be released soon...
+        </Card>
       </div>
-      <p className="text-slate-500 text-sm mt-6">AetherGraph is a framework: it <em>enables</em> artifact‑anchored reports and workflows; it doesn’t auto‑publish without you.</p>
     </div>
   </section>
 )
+
 
 export const Services: React.FC = () => (
   <section id="services" className="py-24">

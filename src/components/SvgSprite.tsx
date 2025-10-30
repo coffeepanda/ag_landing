@@ -1,8 +1,8 @@
-
 import React from 'react'
 
 const SvgSprite: React.FC = () => (
   <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+    {/* === Existing icons (unchanged) === */}
     <symbol id="icon-analysis" viewBox="0 0 24 24"><path d="M4 20h16M6 16v-4m6 4V8m6 8v-6"/><path d="M5 20V6a2 2 0 0 1 2-2h6l5 5v11"/></symbol>
     <symbol id="icon-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 13l3-3M9 4h6"/></symbol>
     <symbol id="icon-report" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6M9 8h3"/></symbol>
@@ -19,6 +19,30 @@ const SvgSprite: React.FC = () => (
     <symbol id="icon-robot" viewBox="0 0 24 24"><rect x="6" y="7" width="12" height="10" rx="2"/><circle cx="10" cy="12" r="1"/><circle cx="14" cy="12" r="1"/><path d="M12 7V4"/></symbol>
     <symbol id="icon-fin" viewBox="0 0 24 24"><path d="M4 18h16"/><path d="M6 16v-4m4 4V8m4 8v-6m4 6v-9"/></symbol>
     <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+
+    {/* === New icons added === */}
+
+    {/* Integration / Drop-in agent */}
+    <symbol id="icon-plug" viewBox="0 0 24 24">
+      <path d="M9 7v4M15 7v4"/>
+      <path d="M7 11h10v2a5 5 0 0 1-5 5a5 5 0 0 1-5-5v-2z"/>
+      <path d="M12 18v3"/>
+    </symbol>
+
+    {/* Copilot (you can also use existing #icon-robot if you prefer) */}
+    <symbol id="icon-bot" viewBox="0 0 24 24">
+      <rect x="4" y="7" width="16" height="10" rx="3"/>
+      <path d="M12 3v4"/>
+      <circle cx="9" cy="12" r="1.5"/>
+      <circle cx="15" cy="12" r="1.5"/>
+      <path d="M8 17c1.5 1 6.5 1 8 0"/>
+    </symbol>
+
+    {/* Sparkles / “More examples” */}
+    <symbol id="icon-sparkles" viewBox="0 0 24 24">
+      <path d="M12 3l2 4l4 2l-4 2l-2 4l-2-4l-4-2l4-2l2-4z"/>
+      <path d="M18 15l1 2l2 1l-2 1l-1 2l-1-2l-2-1l2-1l1-2z"/>
+    </symbol>
   </svg>
 )
 
