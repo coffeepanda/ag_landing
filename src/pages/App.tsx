@@ -22,7 +22,7 @@ const App: React.FC = () => {
         <OSS />
         <Audience />
         <FAQ />
-        <Waitlist />
+        {/* <Waitlist /> */}
       </main>
       <Footer />
         <footer className="mt-auto">
