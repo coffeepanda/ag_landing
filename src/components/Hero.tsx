@@ -1,18 +1,42 @@
 import React, { useState } from 'react'
 import CodeBlock from './CodeBlock'
-import ChatPreview from './ChatPreview' 
+import ChatPreview from './ChatPreview'
 
 const Hero: React.FC = () => {
   const [tab, setTab] = useState<'chat' | 'code'>('chat')
 
-  const PY_SNIPPET = `# pseudo-code example
-@graph_fun(name="analyze_csv")
-def analyze_csv(path: str, column: str):
-    df = load_csv(path)
-    fig = plot_hist(df[column])
-    art_id = artifacts.save(fig, name=f"hist_{column}")  # explicit save
-    return {"artifact_id": art_id, "message": "Chart ready"}
-`
+// Replace your PY_SNIPPET with this:
+const PY_SNIPPET = `
+from aethergraph import graph_fn, NodeContext
+
+@graph_fn(name="hello_world")
+async def hello_world(*, context: NodeContext):
+    # 1) Ask the user what to look for (artifact kind)
+    kind = await context.channel().ask_text("What artifact kind should I search for?")
+    if not kind:
+        await context.channel().send_text("Cancelled.")
+        return {"status": "cancelled"}
+
+    # 2) Search artifacts by kind (backend supports kind indexing)
+    arts = context.artifacts()
+    results = await arts.search(kind=kind)
+
+    # 3) Report back to the channel
+    if not results:
+        await context.channel().send_text("🔎 No artifacts found for that kind. Try another.")
+        return {"status": "ok", "count": 0, "kind": kind}
+
+    total = len(results)
+    top = results[:8]
+    lines = "\\n".join(f"- {a.uri}" for a in top)
+    more = "" if total <= 8 else f"\\n…and {total - 8} more."
+
+    await context.channel().send_text(f"🔎 Matches found: {total} (kind = {kind!r})")
+    await context.channel().send_text(lines + more)
+
+    return {"status": "ok", "count": total, "kind": kind}
+`.trim()
+
 
   return (
     <section className="relative overflow-hidden">
@@ -20,24 +44,42 @@ def analyze_csv(path: str, column: str):
         <div className="absolute -top-24 -right-24 w-[500px] h-[500px] rounded-full bg-brand/10"></div>
         <div className="absolute -bottom-24 -left-24 w-[420px] h-[420px] rounded-full bg-accent/10"></div>
       </div>
+
       <div className="mx-auto px-6 container-max py-20 md:py-28 relative">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand tag mb-4">
-              <span className="inline-block w-2 h-2 rounded-full bg-brand"></span> Open core for real R&D
+              <span className="inline-block w-2 h-2 rounded-full bg-brand"></span> Agentic workflows for real R&D
             </div>
+
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
-              Talk to your tools. <span className="text-brand">Keep your provenance.</span>
+              Talk to your Python. <span className="text-brand">Keep your provenance.</span>
             </h1>
+
             <p className="text-slate-700 mt-5 text-lg">
-              AetherGraph turns any Python function into an interactive, auditable workflow—chat through Slack/CLI,
-              save artifacts for versioning and tracing, and resume anywhere.
+              AetherGraph turns plain Python into interactive, auditable agents—chat via Slack/CLI, capture artifacts &amp; metrics, log events to memory, and drive AI-assisted workflows via built-in context methods.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <a href="#waitlist" className="px-5 py-3 rounded-xl bg-accent text-white font-semibold shadow-soft">Join the waitlist</a>
-              <a href="#examples" className="px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-soft">See example flows</a>
+              <a href="#examples" className="px-5 py-3 rounded-xl bg-accent text-white font-semibold shadow-soft">
+                See example flow
+              </a>
+
+              {/* Disabled GitHub button until repo is live */}
+              <button
+                type="button"
+                aria-disabled="true"
+                disabled
+                title="Public repo goes live soon"
+                className="px-5 py-3 rounded-xl bg-slate-200 text-slate-500 font-semibold shadow-soft cursor-not-allowed"
+              >
+                GitHub (soon)
+              </button>
             </div>
-            <p className="text-slate-500 mt-3 text-sm">Public alpha targeting <strong>mid-November 2025</strong> (docs, demo, quickstart).</p>
+
+            <p className="text-slate-500 mt-3 text-sm">
+              Public alpha targeting <strong>mid-November 2025</strong> (docs, demo, quickstart).
+            </p>
           </div>
 
           <div className="md:pl-8">
@@ -46,7 +88,7 @@ def analyze_csv(path: str, column: str):
                 onClick={() => setTab('chat')}
                 className={`px-3 py-1 rounded-lg text-sm ${tab === 'chat' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
               >
-                Chat (mock)
+                Chat
               </button>
               <button
                 onClick={() => setTab('code')}
@@ -62,7 +104,7 @@ def analyze_csv(path: str, column: str):
                 {tab === 'chat' ? (
                   <ChatPreview className="h-full" />
                 ) : (
-                  <CodeBlock code={PY_SNIPPET} language="python" title="analyze_csv.py" fullHeight />
+                  <CodeBlock code={PY_SNIPPET} language="python" title="hello_world.py" fullHeight />
                 )}
               </div>
               <p className="text-slate-500 text-xs mt-2">Toggle between chat and code sketch to see how it works.</p>

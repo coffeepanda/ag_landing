@@ -11,7 +11,7 @@ const Privacy: React.FC = () => {
         <section className="py-16">
           <div className="mx-auto px-6 container-max prose prose-slate">
             <h1>Privacy</h1>
-            <p>We’ll add our real policy here later. For now: we respect your data, and we’ll only email you for substantive updates.</p>
+            <p>We don’t collect personal data on this site beyond voluntary email you send to us. No third-party tracking, no cookies. If you contact us, we’ll use your email only to reply. You can request deletion anytime at hello@yourdomain.</p>
           </div>
         </section>
       </main>
