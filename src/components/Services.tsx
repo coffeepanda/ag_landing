@@ -43,30 +43,9 @@ export const Services: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Optional basics + Extensibility */}
-        <div className="mt-8">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Optional basics</div>
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] border border-slate-200">
-              Included defaults · bring your own if you prefer
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr items-stretch">
-            {optional.map((i) => (
-              <div key={i.title} className="aeg-card h-full min-h-[148px] p-5 flex flex-col">
-                <div className="flex items-center gap-2 text-slate-800 mb-2">
-                  <svg className="icon-2d text-slate-700"><use href={i.icon} /></svg>
-                  <div className="font-medium">{i.title}</div>
-                </div>
-                <p className="text-slate-700 text-sm leading-relaxed">{i.desc}</p>
-              </div>
-            ))}
-          </div>
           <p className="text-slate-500 text-xs mt-3">
-            All above are accessed as <code className="font-mono">context.*</code> methods across agents — extend by registering your own services.
+            We also provide optional basic services such as <span className="font-mono">llm</span>, <span className="font-mono">rag</span>, and <span className="font-mono">mcp</span>. You can also bring your own services and integrate it with AetherGraph. All above are accessed as <code className="font-mono">context.*</code> methods across agents.
           </p>
-        </div>
       </div>
     </section>
   )
