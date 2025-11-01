@@ -2,19 +2,16 @@ import React from "react"
 
 export const Services: React.FC = () => {
   const core = [
-    { icon: '#icon-channel',  title: 'Channels',  desc: 'Slack / CLI messages, progress, approvals.' },
-    { icon: '#icon-artifact', title: 'Artifacts', desc: 'Save charts/tables/logs for versioning & tracing.' },
-    { icon: '#icon-memory',   title: 'Memory',    desc: 'Recall prior runs and context across agents.' },
-    { icon: '#icon-logger',   title: 'Logger',    desc: 'Structured logs tied to steps and artifacts.' },
-    { icon: '#icon-kv',       title: 'KV',        desc: 'Tiny key–value store for run state/config.' },
-  ]
-
-  const optional = [
-    { icon: '#icon-robot',    title: 'LLM',       desc: 'Chat, generate, embed — swappable client.' },
-    { icon: '#icon-analysis', title: 'RAG',       desc: 'Query your artifacts/docs to ground outputs.' },
+    { icon: '#icon-channel',  title: 'Channels',  desc: 'Slack / CLI messages, progress, approvals. Send/receive files, and more.' },
+    { icon: '#icon-artifact', title: 'Artifacts', desc: 'Save charts/tables/logs for versioning & tracing and querying with ease.' },
+    { icon: '#icon-memory',   title: 'Memory',    desc: 'Recall prior runs and context across agents with hierarchical memory system.' },
+    { icon: '#icon-logger',   title: 'Logger',    desc: 'Structured logs tied to steps and graph nodes.' },
+    { icon: '#icon-kv',       title: 'KV',        desc: 'Tiny key–value store for run state/config across agents in a session.' },
+    { icon: '#icon-robot',    title: 'LLM',       desc: 'Chat, generate, embed — swappable client with various backends.' },
+    { icon: '#icon-analysis', title: 'RAG',       desc: 'Query your artifacts, docs, and memory to ground outputs.' },
     { icon: '#icon-plug',     title: 'MCP',       desc: 'Call external tools/services via MCP.' },
-    // Extensibility card
-    { icon: '#icon-sparkles', title: 'Bring your own', desc: 'Register custom services as context.*' },
+    { icon: '#icon-sparkles', title: 'Bring your own', desc: 'Register custom services as context.* as needed.' },
+
   ]
 
   return (
@@ -44,7 +41,7 @@ export const Services: React.FC = () => {
           </div>
         </div>
           <p className="text-slate-500 text-xs mt-3">
-            We also provide optional basic services such as <span className="font-mono">llm</span>, <span className="font-mono">rag</span>, and <span className="font-mono">mcp</span>. You can also bring your own services and integrate it with AetherGraph. All above are accessed as <code className="font-mono">context.*</code> methods across agents.
+            We provide basic context services on <span className="font-mono">llm</span>, <span className="font-mono">rag</span>, and <span className="font-mono">mcp</span>. You can bring your own services and integrate it with AetherGraph. All above are accessed as <code className="font-mono">context.*</code> methods across agents.
           </p>
       </div>
     </section>

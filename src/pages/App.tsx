@@ -6,13 +6,14 @@ import Hero from '../components/Hero'
 import { Examples, Flexibility, Roadmap, OSS, Audience, FAQ } from '../components/Sections'
 import Services from '../components/Services'
 import Footer from '../components/Footer'
-import Waitlist from '../components/Waitlist'
-
+import HashScroller from "../components/HashScroller";
+  
 const App: React.FC = () => {
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white text-slate-900">
       <SvgSprite />
       <Header />
+      <HashScroller />
       <main>
         <Hero />
         <Examples />
@@ -22,11 +23,9 @@ const App: React.FC = () => {
         <OSS />
         <Audience />
         <FAQ />
-        {/* <Waitlist /> */}
       </main>
       <Footer />
         <footer className="mt-auto">
-        {/* Footer inside page to ensure consistent spacing */}
       </footer>
     </div>
   )

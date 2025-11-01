@@ -22,7 +22,7 @@ export const Examples: React.FC = () => (
 
       <div className="grid md:grid-cols-2 gap-6 mt-10">
         <Card title="Interactive analysis" icon="#icon-analysis">
-          Ask a question → helper proposes code → run → get a chart.
+          Ask a question → agent proposes code → run → get report → iterate.
           Save code and outputs as artifacts for a clean, versioned trail.
         </Card>
 
@@ -74,7 +74,7 @@ export const Flexibility: React.FC = () => (
             <div className="font-semibold">Fits when…</div>
           </div>
           <ul className="mt-3 list-disc ml-5 text-slate-800 text-base space-y-1">
-            <li>You need interactive, resumable runs with provenance.</li>
+            <li>You need an agent runs inside your program.</li>
             <li>You save artifacts + memory for summaries and audits.</li>
             <li>You want channel UX (Slack/CLI) for long jobs & approvals.</li>
           </ul>
@@ -164,7 +164,7 @@ export const Audience: React.FC = () => (
 
 
 export const FAQ: React.FC = () => (
-  <section className="py-24 border-t border-slate-200/60">
+  <section id="faq" className="py-24 border-t border-slate-200/60">
     <div className="mx-auto px-6 container-max">
       <h2 className="text-3xl md:text-4xl font-bold tracking-tight">FAQ</h2>
       <div className="grid md:grid-cols-2 gap-6 mt-8">
@@ -174,41 +174,32 @@ export const FAQ: React.FC = () => (
             "No—agents can be pure code. LLMs and AI features are optional when helpful.",
           ],
           [
-            "Do I have to learn a new framework?",
-            "No—start with a decorator; keep your program. Compose flows later if you want.",
+            "Just another agent framework?",
+            "No. You stay in Python—decorate functions, get channels/artifacts/memory built in, and keep full provenance. No DSL, no rewrites."
           ],
           [
             "How do summaries avoid hallucinations?",
-            "Summaries are drafts anchored to saved artifacts and memory; each claim traces to an artifact.",
+            "They’re drafts anchored to saved artifacts and memory. Each claim cites an artifact."
           ],
           [
             "Is this an agent that automates everything?",
-            "AetherGraph is a framework for agentic workflows. Use it as helper functions or automate when ready.",
+            "AetherGraph is a framework for agentic workflows. Use it as helper functions today; automate more when you’re ready."
           ],
-          // New: clarify UI
           [
             "Do you ship a UI?",
             "Not initially—the chat preview is a mock. Slack and CLI integrations are supported with instructions. For custom UI integrations and deployments, please contact us."
           ],
-          // New: hosting/runtime
           [
             "Where does it run?",
-            "Anywhere Python runs—your laptop, servers, or cloud. Keep data where you want it.",
+            "Anywhere Python runs—your laptop, servers, or cloud. You control where data lives."
           ],
-          // New: extensibility
           [
             "Can I bring my own services?",
-            "Yes. Register custom services as context.* (LLM/RAG/tools/MCP/HTTP). Swap providers freely.",
+            "Yes. Register custom services as context.* (LLM, RAG, tools/MCP, HTTP) and swap providers freely."
           ],
-          // New: privacy & data
-          // [
-          //   "What about privacy?",
-          //   "Artifacts and logs stay in your environment. You decide what, if anything, leaves your network.",
-          // ],
-          // New: cost / licenses (adjust copy later if needed)
           [
             "Is there an open-source version?",
-            "Yes. The AetherGraph core is open source under Apache-2.0. Docs and examples ship with the alpha."
+            "Yes. The AetherGraph core will be open-sourced under Apache-2.0 with the alpha (docs & examples included)."
           ],
 
         ].map(([q, a]) => (

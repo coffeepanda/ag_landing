@@ -11,13 +11,14 @@ const Header: React.FC = () => {
           <span className="font-semibold">AIperture · AetherGraph</span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm">
-          <a href="#example" className="hover:text-brand">Example usage</a>
+          {/* <a href="#example" className="hover:text-brand">Example usage</a>
           <a href="#services" className="hover:text-brand">Core services</a>
-          <a href="#flex" className="hover:text-brand">Flexibility</a>
-            {/* <a href="/docs" className="hover:text-brand">Docs</a> */}
-          {/* <a href="#waitlist" className="px-4 py-2 rounded-xl bg-accent text-white font-medium shadow-soft hover:-translate-y-px transition">Join waitlist</a> */}
+          <a href="#flex" className="hover:text-brand">Flexibility</a> */}
+          <Link to="/#examples" className="hover:text-brand">Examples</Link>
+          <Link to="/#services" className="hover:text-brand">Core services</Link>
+          <Link to="/#flex" className="hover:text-brand">Flexibility</Link>
+          <Link to="/#faq" className="hover:text-brand">FAQ</Link>
         </nav>
-        <a href="#waitlist" className="md:hidden inline-flex items-center px-3 py-2 rounded-lg bg-accent text-white">Join</a>
       </div>
     </header>
   )
