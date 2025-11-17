@@ -12,26 +12,28 @@ const Footer: React.FC = () => (
         <a
           href="https://www.linkedin.com/company/aiperture/"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="hover:text-brand"
           aria-label="LinkedIn"
         >
           LinkedIn
         </a>
 
-        {/* GitHub disabled until public */}
-        <button
-          type="button"
-          aria-disabled="true"
-          disabled
-          title="Public repo goes live soon"
-          className="text-slate-400 cursor-not-allowed"
+        {/* GitHub now live */}
+        <a
+          href="https://github.com/AIperture/aethergraph"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-brand"
+          aria-label="GitHub"
         >
-          GitHub (soon)
-        </button>
+          GitHub
+        </a>
 
         {/* <Link to="/changelog" className="hover:text-brand">Changelog</Link> */}
-        <Link to="/privacy" className="hover:text-brand">Privacy</Link>
+        <Link to="/privacy" className="hover:text-brand">
+          Privacy
+        </Link>
         <a
           href="mailto:contact@aiperture.io"
           className="hover:text-brand"

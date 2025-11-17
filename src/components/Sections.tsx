@@ -199,7 +199,7 @@ export const FAQ: React.FC = () => (
           ],
           [
             "Is there an open-source version?",
-            "Yes. The AetherGraph core will be open-sourced under Apache-2.0 with the alpha (docs & examples included)."
+            "Yes. The AetherGraph core is open-sourced under Apache-2.0 with the alpha (docs & examples included)."
           ],
 
         ].map(([q, a]) => (

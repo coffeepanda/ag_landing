@@ -2,10 +2,6 @@ import React, { useState } from 'react'
 import CodeBlock from './CodeBlock'
 import ChatPreview from './ChatPreview'
 
-const Hero: React.FC = () => {
-  const [tab, setTab] = useState<'chat' | 'code'>('chat')
-
-// Replace your PY_SNIPPET with this:
 const PY_SNIPPET = `
 from aethergraph import graph_fn, NodeContext
 
@@ -37,6 +33,8 @@ async def hello_world(*, context: NodeContext):
     return {"status": "ok", "count": total, "kind": kind}
 `.trim()
 
+const Hero: React.FC = () => {
+  const [tab, setTab] = useState<'chat' | 'code'>('chat')
 
   return (
     <section className="relative overflow-hidden">
@@ -49,7 +47,8 @@ async def hello_world(*, context: NodeContext):
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand tag mb-4">
-              <span className="inline-block w-2 h-2 rounded-full bg-brand"></span> Agentic workflows for real R&D
+              <span className="inline-block w-2 h-2 rounded-full bg-brand"></span>
+              Public alpha • Agentic workflows for real R&D
             </div>
 
             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
@@ -57,28 +56,44 @@ async def hello_world(*, context: NodeContext):
             </h1>
 
             <p className="text-slate-700 mt-5 text-lg">
-              AetherGraph turns plain Python into interactive, auditable agents—chat via Slack/CLI, capture artifacts &amp; metrics, log events to memory, and drive AI-assisted workflows via built-in context methods.
+              AetherGraph turns plain Python into interactive, auditable agents—chat via Slack/CLI, capture
+              artifacts &amp; metrics, log events to memory, and drive AI-assisted workflows via built-in
+              context methods.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <a href="#examples" className="px-5 py-3 rounded-xl bg-accent text-white font-semibold shadow-soft">
-                See example flow
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
+              {/* Primary CTA: GitHub */}
+              <a
+                href="https://github.com/AIperture/aethergraph"
+                className="px-5 py-3 rounded-xl bg-accent text-white font-semibold shadow-soft hover:opacity-90 transition"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View on GitHub
               </a>
 
-              {/* Disabled GitHub button until repo is live */}
-              <button
-                type="button"
-                aria-disabled="true"
-                disabled
-                title="Public repo goes live soon"
-                className="px-5 py-3 rounded-xl bg-slate-200 text-slate-500 font-semibold shadow-soft cursor-not-allowed"
+              {/* Secondary: Docs */}
+              <a
+                href="https://aiperture.github.io/aethergraph-docs/"
+                className="px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-soft hover:bg-slate-800 transition"
+                target="_blank"
+                rel="noreferrer"
               >
-                GitHub (soon)
-              </button>
+                Read the docs
+              </a>
+
+              {/* Tertiary: Examples section on the page */}
+              <a
+                href="#examples"
+                className="px-5 py-3 rounded-xl bg-slate-100 text-slate-800 font-semibold shadow-soft hover:bg-slate-200 transition"
+              >
+                See example flow
+              </a>
             </div>
 
             <p className="text-slate-500 mt-3 text-sm">
-              Public alpha targeting <strong>mid-November 2025</strong> (docs, demo, quickstart).
+              Public alpha is live – <span className="font-medium">repo, docs, and examples</span> are available
+              to explore today.
             </p>
           </div>
 
@@ -86,13 +101,17 @@ async def hello_world(*, context: NodeContext):
             <div className="flex items-center gap-2 mb-3">
               <button
                 onClick={() => setTab('chat')}
-                className={`px-3 py-1 rounded-lg text-sm ${tab === 'chat' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+                className={`px-3 py-1 rounded-lg text-sm ${
+                  tab === 'chat' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'
+                }`}
               >
                 Chat
               </button>
               <button
                 onClick={() => setTab('code')}
-                className={`px-3 py-1 rounded-lg text-sm ${tab === 'code' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+                className={`px-3 py-1 rounded-lg text-sm ${
+                  tab === 'code' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'
+                }`}
               >
                 Code
               </button>
@@ -107,7 +126,9 @@ async def hello_world(*, context: NodeContext):
                   <CodeBlock code={PY_SNIPPET} language="python" title="hello_world.py" fullHeight />
                 )}
               </div>
-              <p className="text-slate-500 text-xs mt-2">Toggle between chat and code sketch to see how it works.</p>
+              <p className="text-slate-500 text-xs mt-2">
+                Toggle between chat and code sketch to see how it works.
+              </p>
             </div>
           </div>
         </div>
