@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Public Files 
-public/avatars
+# Build info
+*.tsbuildinfo
