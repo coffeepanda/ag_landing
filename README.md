@@ -76,4 +76,26 @@ same prescribed breeze. The ground sits at the flight's end clearance, so the le
 touches down as the simulated flight ends. Colour and veins are painted art.
 
 Plots (`src/demos/leaf/Plots.tsx`, drag to scrub): the path down, bend and twist,
-speed against the breeze, and rocking (tilt from flat).
+speed against the breeze, and rocking (tilt from flat). Playback is slow motion (¼×)
+by default.
+
+### Last Leaf: "In the air" close-up
+
+A switch on the leaf page (*The fall* / *In the air*) opens a close-up of a separate
+experiment: the resolved shell/air FSI startup (same leaf outline, 20° tilt, 0.3 m/s
+breeze switched on at once, six accepted 1 ms steps). Source: a completed
+`leaf_fall.fsi_snapshot` reference result (canonical
+`demos/01-last-leaf/assets/fsi-natural/selected/native`, or a fresh
+`leaf_fall.fsi_budget ... --profile reference --outline leaf --leaf-chord-cells 8 --leaf-span-cells 24 --mesh-size .04` run, ~35 min):
+
+```powershell
+python -I tools/export_leaf_air.py <ag-physics>/demos/01-last-leaf/assets/fsi-natural/selected/native
+```
+
+It evaluates the saved P2 air velocity / P1 pressure with the solver's own shape
+functions on a regular 40×40×24 grid and on a slice through the leaf (int16 in
+`public/demos/leaf/air.bin`, metadata in `air.json`), and exports the shell at every
+accepted step with its elastic part after a rigid fit. The page streams particles
+through the frozen 6 ms field (slowed), shows the speed or pressure slice, and can
+magnify the leaf's elastic bending ×100. Plots (`AirPlots.tsx`): slice speed and
+pressure with the leaf's cross-section, how the leaf gives way, and the air's push.

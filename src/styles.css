@@ -235,7 +235,10 @@ a.tab:hover { color: var(--ink); }
   animation: fade 1s ease both;
 }
 
-.demo-stage > canvas {
+.view-stage { position: absolute; inset: 0; animation: fade 0.8s ease both; }
+
+.demo-stage > canvas,
+.view-stage > canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -381,6 +384,65 @@ a.tab:hover { color: var(--ink); }
   text-align: right;
 }
 .fig-canvas.scrub { cursor: ew-resize; touch-action: none; }
+
+/* View switch (e.g. The fall / In the air) */
+.view-switch {
+  display: inline-flex;
+  flex-basis: 100%;
+  max-width: max-content;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+}
+.view-switch button {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: color 0.3s, background 0.3s;
+}
+.view-switch button:hover { color: var(--ink); }
+.view-switch button.is-active { color: #120d08; background: var(--gold); }
+.view-switch button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+
+/* Close-up HUD: scale bar projected from the scene */
+.air-hud { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.scale-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(244, 239, 230, 0.7);
+  transform-origin: 0 0;
+}
+.scale-bar::before, .scale-bar::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: rgba(244, 239, 230, 0.7);
+}
+.scale-bar::before { left: 0; }
+.scale-bar::after { right: 0; }
+.scale-bar span {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  white-space: nowrap;
+}
 
 /* Singing glass labels, positioned per frame from the scene */
 .glass-labels { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
@@ -557,7 +619,7 @@ a.tab:hover { color: var(--ink); }
     background: linear-gradient(to top, rgb(10, 9, 8) calc(100% - 16px), rgba(10, 9, 8, 0));
   }
   .demo-stage:has(.behind.is-open) .hint { display: none; }
-  .behind.is-open .behind-body { padding-bottom: 150px; }
+  .behind.is-open .behind-body { padding-bottom: 200px; }
 }
 
 @keyframes rise {
