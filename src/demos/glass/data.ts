@@ -18,9 +18,11 @@ export type Glass = {
   thickness: number
   depth: number
   modes: Mode[]
+  /** Mallet contact force (N) sampled on GlassSet.strike_us. */
+  strike: number[]
 }
 
-export type GlassSet = { version: number; glasses: Glass[] }
+export type GlassSet = { version: number; strike_us: number[]; glasses: Glass[] }
 
 export async function loadGlassSet(): Promise<GlassSet> {
   const res = await fetch(`${import.meta.env.BASE_URL}demos/glass/glass.json`)

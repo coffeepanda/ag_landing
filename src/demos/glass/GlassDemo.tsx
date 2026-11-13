@@ -1,7 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { BehindPanel, BehindToggle } from '../../components/BehindPanel'
 import { GlassAudio } from './audio'
 import { loadGlassSet, type Glass } from './data'
+import GlassPlots from './Plots'
 import type { GlassScene } from './scene'
+
+const SIMULATED =
+  'Twelve glasses, each tuned with water to one note from A4 to G#5. For every glass we computed how its bowl vibrates, then struck it with a small mallet and followed the contact. What you hear and see comes from those results.'
+
+const ASSUMED = [
+  'A simplified, straight-walled bowl and idealised water loading.',
+  'Damping is fixed, not measured from real glass.',
+  'The sound comes from the rim’s motion, not a microphone.',
+  'On screen, the motion is magnified and slowed so you can see it.'
+]
 
 // Number row, left to right = low to high.
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=']
@@ -33,8 +45,31 @@ export default function GlassDemo() {
   const [sound, setSound] = useState(true)
   const [playing, setPlaying] = useState(false)
   const [touched, setTouched] = useState(false)
+  const [panel, setPanel] = useState(false)
+  const [strikeUs, setStrikeUs] = useState<number[]>([])
+  const panelRef = useRef<HTMLElement>(null)
   const soundRef = useRef(sound)
   soundRef.current = sound
+
+  const getFocus = useCallback(() => sceneRef.current?.latest() ?? null, [])
+  const closePanel = useCallback(() => setPanel(false), [])
+
+  // Keep the glasses centred in whatever the panel leaves uncovered.
+  useEffect(() => {
+    const fit = () => {
+      const s = sceneRef.current
+      const el = panelRef.current
+      const stage = el?.offsetParent as HTMLElement | null
+      if (!s || !el || !stage) return
+      if (!panel) return s.setInset(0, 0)
+      const sheet = window.matchMedia('(max-width: 720px)').matches
+      if (sheet) s.setInset(0, stage.clientHeight - el.offsetTop)
+      else s.setInset(stage.clientWidth - el.offsetLeft, 0)
+    }
+    fit()
+    window.addEventListener('resize', fit)
+    return () => window.removeEventListener('resize', fit)
+  }, [panel, glasses])
 
   // Scene: data + WebGL. three.js is only loaded with this demo.
   useEffect(() => {
@@ -46,6 +81,7 @@ export default function GlassDemo() {
         if (disposed || !canvasRef.current) return
         glassesRef.current = set.glasses
         setGlasses(set.glasses)
+        setStrikeUs(set.strike_us)
         scene = new mod.GlassScene(canvasRef.current, set.glasses, {
           reducedMotion,
           onFrame: (labels) => {
@@ -194,11 +230,15 @@ export default function GlassDemo() {
         <button className={`btn ${sound ? '' : 'is-off'}`} onClick={() => setSound((s) => !s)} aria-pressed={sound}>
           Sound {sound ? 'on' : 'off'}
         </button>
+        <BehindToggle open={panel} onToggle={() => setPanel((p) => !p)} />
         <span className={`hint ${touched ? 'is-faded' : ''}`}>
           <span className="hint-fine">Click a glass, or drag across them · keys 1 – =</span>
           <span className="hint-coarse">Tap a glass, or slide across them</span>
         </span>
       </div>
+      <BehindPanel ref={panelRef} open={panel} onClose={closePanel} simulated={SIMULATED} assumed={ASSUMED}>
+        <GlassPlots glasses={glasses} strikeUs={strikeUs} getFocus={getFocus} open={panel} />
+      </BehindPanel>
     </>
   )
 }

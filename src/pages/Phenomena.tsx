@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react'
 import { href } from '../route'
-import { DEFAULT_DEMO, DEMOS, type Demo } from '../site'
+import { DEFAULT_DEMO, DEMOS, PHENOMENA, type Demo } from '../site'
 
 const lazyCache = new Map<string, LazyExoticComponent<ComponentType>>()
 function demoComponent(demo: Demo) {
@@ -13,17 +13,17 @@ function demoComponent(demo: Demo) {
   return c
 }
 
-export default function Demos({ demoId }: { demoId?: string }) {
+export default function Phenomena({ demoId }: { demoId?: string }) {
   const demo = DEMOS.find((d) => d.id === demoId) ?? DEMOS.find((d) => d.id === DEFAULT_DEMO)!
   const View = demoComponent(demo)
 
   return (
     <main className="demo-page">
-      <nav className="strip" aria-label="Demos">
+      <nav className="strip" aria-label="Phenomena">
         {DEMOS.map((d) => (
           <a
             key={d.id}
-            href={href('demos', d.id)}
+            href={href(PHENOMENA, d.id)}
             className={`chip-link ${d.id === demo.id ? 'is-active' : ''} ${d.load ? '' : 'is-soon'}`}
             aria-current={d.id === demo.id ? 'page' : undefined}
           >

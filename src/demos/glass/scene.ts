@@ -41,6 +41,9 @@ export class GlassScene {
   private tex = { glint: glowTexture([255, 236, 205]), shadow: shadowTexture() }
   private width = 1
   private height = 1
+  /** Screen area covered by an overlay (px): the view re-centres into what is left. */
+  private inset = { r: 0, b: 0 }
+  private insetTarget = { r: 0, b: 0 }
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -111,6 +114,22 @@ export class GlassScene {
 
   setHover(i: number) {
     this.hover = i
+  }
+
+  /** Most recent strike that has started: glass index and seconds since it. */
+  latest(): { i: number; tau: number } | null {
+    const t = now()
+    let best: { i: number; t0: number } | null = null
+    this.views.forEach((v, i) => {
+      for (const s of v.strikes) if (s.t0 <= t && (!best || s.t0 > best.t0)) best = { i, t0: s.t0 }
+    })
+    const b = best as { i: number; t0: number } | null
+    return b ? { i: b.i, tau: t - b.t0 } : null
+  }
+
+  /** Overlay coverage in px from the right / bottom edge; eased in the frame loop. */
+  setInset(right: number, bottom: number) {
+    this.insetTarget = { r: Math.max(0, right), b: Math.max(0, bottom) }
   }
 
   dispose() {
@@ -268,13 +287,23 @@ export class GlassScene {
     this.width = Math.max(1, el.clientWidth)
     this.height = Math.max(1, el.clientHeight)
     this.renderer.setSize(this.width, this.height, false)
-    const aspect = this.width / this.height
+    this.applyView()
+  }
+
+  private applyView() {
+    const { width: w, height: h, inset } = this
+    const aspect = w / h
     this.camera.aspect = aspect
-    this.layout(aspect)
+    this.layout(aspect, Math.max(0.3, (w - inset.r) / h), inset.b / h)
+    // Shift the projection so the scene centres in the uncovered region.
+    // (Bottom sheets shift less than half: the band under the nav stays clear.)
+    if (inset.r > 0.5 || inset.b > 0.5) this.camera.setViewOffset(w, h, inset.r / 2, inset.b * 0.47, w, h)
+    else this.camera.clearViewOffset()
     this.camera.updateProjectionMatrix()
   }
 
-  private layout(aspect: number) {
+  /** aspect picks the arrangement; fitAspect / bottomFrac fit it into the uncovered area. */
+  private layout(aspect: number, fitAspect = aspect, bottomFrac = 0) {
     const n = this.views.length
     const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))
     if (aspect >= 0.95) {
@@ -287,7 +316,7 @@ export class GlassScene {
         v.group.rotation.y = a * 0.6
       })
       const half = span / 2 + 0.07
-      const d = Math.max(half / (tanV * aspect), 0.28 / tanV) * 1.04
+      const d = Math.max(half / (tanV * fitAspect), 0.28 / tanV) * 1.04 * (1 + 0.8 * bottomFrac)
       this.base.target.set(0, 0.105, 0.04)
       this.base.pos.set(0, 0.105 + d * 0.42, 0.04 + d * 0.96)
     } else {
@@ -304,7 +333,8 @@ export class GlassScene {
         v.group.rotation.y = 0
       })
       const half = ((per - 1) / 2) * sp + sp / 4 + 0.085
-      const d = half / (tanV * aspect)
+      // With a bottom sheet open, shrink the set to fit the band between nav and sheet.
+      const d = (half / (tanV * fitAspect)) * (1 + 2 * bottomFrac)
       this.base.target.set(0, 0.17, 0.01)
       this.base.pos.set(0, 0.17 + d * 0.7, 0.01 + d * 0.72)
     }
@@ -315,6 +345,19 @@ export class GlassScene {
   private frame = () => {
     this.raf = requestAnimationFrame(this.frame)
     const t = now()
+
+    // Ease the overlay inset so the scene glides aside rather than jumping.
+    const dr = this.insetTarget.r - this.inset.r
+    const db = this.insetTarget.b - this.inset.b
+    if (Math.abs(dr) > 0.5 || Math.abs(db) > 0.5) {
+      const k = this.opts.reducedMotion ? 1 : 0.12
+      this.inset.r += dr * k
+      this.inset.b += db * k
+      this.applyView()
+    } else if (dr !== 0 || db !== 0) {
+      this.inset = { ...this.insetTarget }
+      this.applyView()
+    }
 
     // Camera: slight parallax toward the pointer, and a slow idle drift.
     if (!this.opts.reducedMotion) {

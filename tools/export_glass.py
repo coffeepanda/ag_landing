@@ -7,8 +7,9 @@ Writes the small display bundle used by the landing page:
     public/demos/glass/glass.json
 
 Only what the page draws and plays is exported: per-glass dimensions and water
-depth, and per-mode frequency, decay, phase, circumferential order, rim shape
-coefficients and the rim-readout sound weight. Nothing else leaves the result.
+depth; per-mode frequency, decay, phase, circumferential order, rim shape
+coefficients and the rim-readout sound weight; and the mallet contact force,
+resampled for the "behind the scene" plot. Nothing else leaves the result.
 
 Usage:
     python tools/export_glass.py <result-dir> [--out public/demos/glass/glass.json]
@@ -20,6 +21,8 @@ from pathlib import Path
 
 import numpy as np
 
+STRIKE_WINDOW = 60e-6  # s; the saved mallet contacts last about 40-45 us
+STRIKE_POINTS = 61
 NOTE_NAMES = ('A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5')
 
 
@@ -72,6 +75,11 @@ def main():
         err = np.max(abs(synth(modes, t[core]) - saved[core])) / np.max(abs(saved))
         worst = max(worst, float(err))
 
+        # Mallet contact force, resampled on a common 0-60 us grid for the strike plot.
+        contact = arrays(root, f'note_{i:02d}.contact')
+        grid = np.linspace(0.0, STRIKE_WINDOW, STRIKE_POINTS)
+        force = np.interp(grid, contact['time'], contact['force'], right=0.0)
+
         glasses.append(dict(
             note=name,
             midi=int(table['midi'][i]),
@@ -81,6 +89,7 @@ def main():
             thickness=float(table['thickness'][i]),
             depth=float(table['water_depth'][i]),
             modes=sorted(modes, key=lambda m: m['f']),
+            strike=[float(f) for f in force],   # N, on strike_us
         ))
 
     if worst > 1e-6:
@@ -96,7 +105,9 @@ def main():
         return x
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(rounded(dict(version=1, glasses=glasses)), separators=(',', ':')))
+    strike_us = (np.linspace(0.0, STRIKE_WINDOW, STRIKE_POINTS) * 1e6).tolist()
+    bundle = dict(version=2, strike_us=strike_us, glasses=glasses)
+    args.out.write_text(json.dumps(rounded(bundle), separators=(',', ':')))
     print(f'wrote {args.out} ({args.out.stat().st_size} bytes); max synth error {worst:.2e}')
     for g in glasses:
         m0 = g['modes'][0]

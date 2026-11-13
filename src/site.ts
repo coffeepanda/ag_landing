@@ -5,9 +5,11 @@ export const CONTACT = 'contact@aiperture.io'
 /** Top-level sections. `soon` tabs render dimmed and are not clickable. */
 export type Section = { id: string; label: string; soon?: boolean }
 
+export const PHENOMENA = 'phenomena'
+
 export const SECTIONS: Section[] = [
   { id: '', label: 'Unknown' },
-  { id: 'demos', label: 'Demos' },
+  { id: PHENOMENA, label: 'Phenomena' },
   { id: 'platform', label: 'Platform', soon: true },
   { id: 'company', label: 'Company', soon: true }
 ]

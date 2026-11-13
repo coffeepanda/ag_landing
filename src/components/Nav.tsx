@@ -1,5 +1,5 @@
 import { href, type Route } from '../route'
-import { SECTIONS } from '../site'
+import { PHENOMENA, SECTIONS } from '../site'
 
 export default function Nav({ route }: { route: Route }) {
   return (
@@ -9,8 +9,9 @@ export default function Nav({ route }: { route: Route }) {
         <span className="tag">Preview</span>
       </a>
       <nav className="tabs" aria-label="Sections">
-        {SECTIONS.map((s) =>
-          s.soon ? (
+        {SECTIONS.map((s) => {
+          const active = route.section === s.id || (s.id === PHENOMENA && route.section === 'demos')
+          return s.soon ? (
             <span key={s.id} className="tab is-soon" aria-disabled="true">
               {s.label}
               <sup>soon</sup>
@@ -18,14 +19,14 @@ export default function Nav({ route }: { route: Route }) {
           ) : (
             <a
               key={s.id}
-              className={`tab ${route.section === s.id ? 'is-active' : ''}`}
+              className={`tab ${active ? 'is-active' : ''}`}
               href={href(s.id)}
-              aria-current={route.section === s.id ? 'page' : undefined}
+              aria-current={active ? 'page' : undefined}
             >
               {s.label}
             </a>
           )
-        )}
+        })}
       </nav>
     </header>
   )
