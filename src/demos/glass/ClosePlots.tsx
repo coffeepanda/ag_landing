@@ -17,10 +17,11 @@ function hz(f: number) {
  * Plots behind the close-up: the strike (force), how each ring shape builds during the
  * contact, and how the strike's energy is shared between ring shapes.
  */
-export default function ClosePlots({ glass, getTime, family, open }: { glass: CloseGlass | null; getTime: () => number; family: number | null; open: boolean }) {
+export default function ClosePlots({ glass, air, getTime, family, open }: { glass: CloseGlass | null; air: Int16Array | null; getTime: () => number; family: number | null; open: boolean }) {
   const strike = useRef<HTMLCanvasElement>(null)
   const build = useRef<HTMLCanvasElement>(null)
   const energy = useRef<HTMLCanvasElement>(null)
+  const sound = useRef<HTMLCanvasElement>(null)
 
   // Per-family amplitude during the contact window: sqrt(sum q^2) over the family's two modes.
   const fam = useMemo(() => {
@@ -36,6 +37,17 @@ export default function ClosePlots({ glass, getTime, family, open }: { glass: Cl
     const max = Math.max(...series.flat())
     return { orders, series, max }
   }, [glass])
+
+  // Sound map: RMS pressure on the slice. Each ring family (a pair of modes at one pitch)
+  // adds coherently; different families add in power.
+  useEffect(() => {
+    if (!open || !glass || !air || !sound.current) return
+    const draw = () => sound.current && drawSound(sound.current, glass, air, family)
+    draw()
+    const ro = new ResizeObserver(draw)
+    ro.observe(sound.current)
+    return () => ro.disconnect()
+  }, [open, glass, air, family])
 
   useEffect(() => {
     if (!open || !glass || !fam) return
@@ -61,6 +73,9 @@ export default function ClosePlots({ glass, getTime, family, open }: { glass: Cl
       </Figure>
       <Figure title="Energy in each ring shape" caption="How the strike’s energy is shared after release, with each shape’s pitch. The lowest, two-lobe shape sets the note you hear.">
         <canvas ref={energy} className="fig-canvas" style={{ height: 120 }} />
+      </Figure>
+      <Figure title="Sound around the glass" caption="Seen from above: how strongly the ringing glass pushes on the air around it, just after the strike. A shape with n lobes sends sound out in 2n beams, with quiet directions between them.">
+        <canvas ref={sound} className="fig-canvas" style={{ height: 200 }} />
       </Figure>
     </div>
   )
@@ -172,3 +187,63 @@ function drawEnergy(c: HTMLCanvasElement, glass: CloseGlass, sel: number | null)
     g.fillText(`${hz(frequency[k]!)} Hz`, x + bw / 2, h - 4)
   })
 }
+
+function drawSound(c: HTMLCanvasElement, glass: CloseGlass, air: Int16Array, sel: number | null) {
+  const { g, w, h } = prep(c)
+  const { n, half, scale } = glass.air
+  const B = 16
+  const size = Math.min(w, h - B)
+  const ox = (w - size) / 2
+  const fams = [...new Set(glass.modes.map((m) => m.n))]
+  const rms = new Float32Array(n * n)
+  let max = 0
+  for (let p = 0; p < n * n; p++) {
+    let power = 0
+    for (const f of fams) {
+      if (sel !== null && f !== sel) continue
+      let re = 0, im = 0
+      glass.modes.forEach((m, k) => {
+        if (m.n !== f) return
+        const Pr = air[2 * (k * n * n + p)]! * scale, Pi = air[2 * (k * n * n + p) + 1]! * scale
+        // Q = i A e^{-i phi}
+        const Qr = m.amp * Math.sin(m.phase), Qi = m.amp * Math.cos(m.phase)
+        re += Pr * Qr - Pi * Qi
+        im += Pr * Qi + Pi * Qr
+      })
+      power += (re * re + im * im) / 2
+    }
+    rms[p] = Math.sqrt(power)
+    max = Math.max(max, rms[p]!)
+  }
+  const img = new ImageData(n, n)
+  for (let row = 0; row < n; row++) {
+    for (let col = 0; col < n; col++) {
+      const v = Math.pow(rms[row * n + col]! / (max || 1), 0.5)
+      const d = ((n - 1 - row) * n + col) * 4 // model +y up on the page
+      img.data[d] = 255 * (0.04 + 0.92 * v)
+      img.data[d + 1] = 255 * (0.03 + 0.7 * v * v)
+      img.data[d + 2] = 255 * (0.05 + 0.4 * v * v * v)
+      img.data[d + 3] = 255
+    }
+  }
+  const off = document.createElement('canvas')
+  off.width = n
+  off.height = n
+  off.getContext('2d')!.putImageData(img, 0, 0)
+  g.imageSmoothingEnabled = true
+  g.drawImage(off, ox, 0, size, size)
+  // Glass rim and 10 cm scale.
+  const px = size / (2 * half)
+  g.strokeStyle = ink(0.8)
+  g.lineWidth = 1
+  g.beginPath(); g.arc(ox + size / 2, size / 2, glass.radius * px, 0, Math.PI * 2); g.stroke()
+  g.strokeStyle = ink(0.6)
+  g.beginPath(); g.moveTo(ox + 6, size - 8); g.lineTo(ox + 6 + 0.1 * px, size - 8); g.stroke()
+  g.fillStyle = ink(0.6)
+  g.textAlign = 'left'
+  g.fillText('10 cm', ox + 8, size - 12)
+  g.fillStyle = ink(0.45)
+  g.textAlign = 'center'
+  g.fillText(`brightest: ${(max * 1000).toFixed(0)} mPa rms · slice at ${Math.round(glass.air.z * 1000)} mm`, w / 2, h - 3)
+}
+

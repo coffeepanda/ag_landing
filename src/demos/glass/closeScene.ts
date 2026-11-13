@@ -34,6 +34,19 @@ export class CloseScene {
     uH: { value: 0.08 },
     uFieldMax: { value: 1 }
   }
+  // Air: per-mode complex pressure fields on a slice; per frame, p = sum_k Re(P_k C_k).
+  private air = {
+    uAir: { value: null as THREE.DataTexture | null },
+    uC: { value: Array.from({ length: NM }, () => new THREE.Vector2()) },
+    uPmax: { value: 1 },
+    uShow: { value: 0 },
+    uN: { value: 72 },
+    uHalf: { value: 0.22 }
+  }
+  private airMesh: THREE.Mesh | null = null
+  private airPeak = new Map<number | null, number>() // display scale per family (Pa)
+  private family: number | null = null
+  private airOn = true
   private maskGoal = new Array(NM).fill(1) as number[]
   private glass!: CloseGlass
   private mallet = new THREE.Group()
@@ -42,8 +55,8 @@ export class CloseScene {
   private clock = 0 // display seconds within the phase
   private tUs = 0 // physical time since first contact (us)
   private q = new Array(NM).fill(0) as number[]
-  private orbit = { az: 0.55, el: 0.5, d: 0.36 }
-  private orbitGoal = { az: 0.55, el: 0.5, d: 0.36 }
+  private orbit = { az: 0.55, el: 0.78, d: 0.5 }
+  private orbitGoal = { az: 0.55, el: 0.78, d: 0.5 }
   private inset = { r: 0, b: 0 }
   private insetTarget = { r: 0, b: 0 }
   private disposables: { dispose(): void }[] = []
@@ -91,8 +104,100 @@ export class CloseScene {
 
   // ---------------------------------------------------------------- controls
 
+  /**
+   * Radiated pressure of each mode on the slice (from the case's surface-source model),
+   * for the current glass. Shown while the glass rings, in step with the wall.
+   */
+  setAir(g: CloseGlass, data: Int16Array) {
+    if (g !== this.glass) return
+    this.clearAir()
+    const { n, half, z, scale } = g.air
+    // Fold each mode's released amplitude in, so texels are pascals (half-float safe).
+    const half16 = new Uint16Array(data.length)
+    const per = n * n * 2
+    for (let i = 0; i < data.length; i++) {
+      const amp = g.modes[Math.floor(i / per)]?.amp ?? 0
+      half16[i] = THREE.DataUtils.toHalfFloat(data[i]! * scale * amp)
+    }
+    const tex = new THREE.DataTexture(half16, n, n * NM, THREE.RGFormat, THREE.HalfFloatType)
+    tex.magFilter = tex.minFilter = THREE.LinearFilter
+    tex.needsUpdate = true
+    this.air.uAir.value = tex
+    this.air.uN.value = n
+    this.air.uHalf.value = half
+    // Display scale for all modes and for each ring family on its own.
+    this.airPeak.clear()
+    const fams: (number | null)[] = [null, ...new Set(g.modes.map((m) => m.n))]
+    for (const f of fams) {
+      let peak = 0
+      for (let p = 0; p < n * n; p++) {
+        let a = 0
+        g.modes.forEach((m, k) => {
+          if (f !== null && m.n !== f) return
+          a += Math.hypot(data[2 * (k * n * n + p)]!, data[2 * (k * n * n + p) + 1]!) * scale * m.amp
+        })
+        peak = Math.max(peak, a)
+      }
+      this.airPeak.set(f, peak * 0.35)
+    }
+    this.air.uPmax.value = this.airPeak.get(this.family) ?? 1
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2 * half, 2 * half).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({
+      uniforms: { ...this.air, uR: { value: g.radius } },
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      vertexShader: `
+        varying vec3 vW;
+        void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: `
+        #define NM ${NM}
+        uniform sampler2D uAir; uniform vec2 uC[NM]; uniform float uPmax; uniform float uShow;
+        uniform float uN; uniform float uHalf; uniform float uR;
+        varying vec3 vW;
+        void main() {
+          // Lathe frame: three x = model y, three z = model x (model theta from model x).
+          float mx = vW.z, my = vW.x;
+          float u = (mx + uHalf) / (2.0 * uHalf), v = (my + uHalf) / (2.0 * uHalf);
+          float rho = length(vec2(mx, my));
+          float edge = 1.0 - smoothstep(uHalf * 0.82, uHalf, rho);
+          float row = clamp(v * uN, 0.5, uN - 0.5);
+          float p = 0.0;
+          for (int k = 0; k < NM; k++) {
+            vec2 P = texture2D(uAir, vec2(u, (float(k) * uN + row) / (uN * float(NM)))).rg;
+            p += P.x * uC[k].x - P.y * uC[k].y;
+          }
+          float f = clamp(p / uPmax, -1.0, 1.0);
+          float m = pow(abs(f), 0.75);
+          vec3 col = f > 0.0 ? vec3(0.98, 0.62, 0.28) : vec3(0.3, 0.58, 1.0);
+          float a = (0.04 + 0.78 * m) * edge * uShow;
+          gl_FragColor = vec4(col * m * 1.2, a);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }`
+    }))
+    mesh.position.y = FOOT + z
+    mesh.renderOrder = 0
+    this.scene.add(mesh)
+    this.airMesh = mesh
+  }
+
+  setAirVisible(on: boolean) {
+    this.airOn = on
+  }
+
+  private clearAir() {
+    if (!this.airMesh) return
+    this.scene.remove(this.airMesh)
+    this.airMesh.geometry.dispose()
+    ;(this.airMesh.material as THREE.Material).dispose()
+    this.air.uAir.value?.dispose()
+    this.air.uAir.value = null
+    this.airMesh = null
+  }
+
   setGlass(g: CloseGlass) {
     this.glass = g
+    this.clearAir()
     this.group.traverse((o) => (o as THREE.Mesh).geometry?.dispose())
     this.group.clear()
     const R = g.radius, H = g.height, t = Math.max(g.thickness, 0.0012)
@@ -128,6 +233,7 @@ export class CloseScene {
 
   /** Show only one ring family (n = 2..6), or all (null). */
   setFamily(n: number | null) {
+    this.family = n
     this.glass.modes.forEach((m, k) => (this.maskGoal[k] = n === null || m.n === n ? 1 : 0))
   }
 
@@ -137,7 +243,7 @@ export class CloseScene {
   }
 
   zoomBy(f: number) {
-    this.orbitGoal.d = Math.max(0.16, Math.min(0.8, this.orbitGoal.d * f))
+    this.orbitGoal.d = Math.max(0.16, Math.min(1.0, this.orbitGoal.d * f))
   }
 
   setInset(right: number, bottom: number) {
@@ -151,6 +257,7 @@ export class CloseScene {
   dispose() {
     cancelAnimationFrame(this.raf)
     this.ro.disconnect()
+    this.clearAir()
     this.scene.traverse((o) => {
       const m = o as THREE.Mesh
       m.geometry?.dispose()
@@ -255,9 +362,22 @@ export class CloseScene {
       const tPhys = WINDOW_US * 1e-6 + this.clock / SLOW_RING
       this.tUs = tPhys * 1e6
       const ts = tPhys - g.contact.end_us * 1e-6 // since final release
-      g.modes.forEach((m, k) => (this.q[k] = m.amp * Math.exp(-m.gamma * ts) * Math.sin(2 * Math.PI * m.f * ts + m.phase)))
+      g.modes.forEach((m, k) => {
+        const th = 2 * Math.PI * m.f * ts + m.phase
+        const e = m.amp * Math.exp(-m.gamma * ts)
+        this.q[k] = e * Math.sin(th)
+        // q_k(t) = Re(Q_k e^{-i w t}) with Q_k = i A e^{-i phi}; pressure uses the same phasor.
+        // (the amplitude A is already folded into the texture: here only decay and phase)
+        const d = Math.exp(-m.gamma * ts) * this.uniforms.uMask.value[k]!
+        this.air.uC.value[k]!.set(d * Math.sin(th), d * Math.cos(th))
+      })
       gap = 0.004 + 0.04 * (1 - Math.exp(-this.clock * 1.5))
     }
+    // The sound field appears once the glass is ringing freely.
+    const airGoal = this.airOn && this.phase === 'ring' ? 1 : 0
+    const pGoal = this.airPeak.get(this.family)
+    if (pGoal) this.air.uPmax.value += (pGoal - this.air.uPmax.value) * Math.min(1, dt * 4)
+    this.air.uShow.value += (airGoal - this.air.uShow.value) * Math.min(1, dt * 3)
     for (let k = 0; k < NM; k++) {
       this.uniforms.uQ.value[k] = this.q[k]!
       const mv = this.uniforms.uMask.value

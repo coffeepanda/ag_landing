@@ -15,6 +15,11 @@ The page rebuilds the displacement field from the model's own prescribed basis,
     r = cos(n theta) | sin(n theta),  t = -sin(n theta)/n | cos(n theta)/n,
 so the exporter first checks that this analytic basis reproduces the saved one.
 
+It also writes, per glass, public/demos/glass/air/NN.bin: the radiated pressure of each
+mode on a horizontal slice through the bowl, from the case's own surface-source
+surrogate (simulation._pressure): p = -rho w^2/(4 pi) sum_i A_i v_i exp(ikR)/R over the
+saved wall patches. With ag-physics on PYTHONPATH it cross-checks against that function.
+
 Usage:
     python -I tools/export_glass_closeup.py <result-dir>
 """
@@ -55,6 +60,31 @@ def r(a, d):
     return np.round(np.asarray(a, float), d).ravel().tolist()
 
 
+AIR_DENSITY, SOUND_SPEED = 1.2, 343.0   # the case model's air (model.py)
+AIR_N, AIR_HALF = 72, 0.22              # slice grid: 72 x 72 over +-22 cm
+
+
+def pressure_per_mode(geo, eig, omega, targets):
+    """The case's surface-source pressure (simulation._pressure) for one mode, per unit
+    modal coordinate: p = -rho w^2/(4 pi) sum_i A_i (radial_basis_i . eig) e^{ikR}/R."""
+    strength = geo['source_areas'] * (geo['source_radial_basis'] @ eig)
+    R = np.linalg.norm(targets[:, None, :] - geo['source_centres'][None], axis=2)
+    return -AIR_DENSITY * omega ** 2 / (4 * np.pi) * ((np.exp(1j * omega / SOUND_SPEED * R) / R) @ strength)
+
+
+def check_against_case(root, geo_name, geo, eig, omega, targets):
+    """Compare with the case's own _pressure when ag-physics is importable."""
+    try:
+        from examples._shared import load_result
+        from singing_glass import model, simulation
+    except ImportError:
+        return None
+    ds = load_result(root).datasets()[geo_name]
+    ref = simulation._pressure(model.default_config(profile='reference'), omega, ds, targets, eig.astype(complex))
+    ours = pressure_per_mode(geo, eig, omega, targets)
+    return float(np.abs(ref - ours).max() / np.abs(ref).max())
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('result', type=Path)
@@ -72,6 +102,9 @@ def main():
         raise SystemExit(f'analytic basis differs from saved basis by {worst:.2e}')
 
     glasses = []
+    air_dir = out.parent / 'air'
+    air_dir.mkdir(parents=True, exist_ok=True)
+    air_check = None
     for i, note in enumerate(NOTES):
         rel = arrays(root, f'note_{i:02d}.release_modes')
         rmeta = meta(root, f'note_{i:02d}.release_modes')
@@ -86,6 +119,27 @@ def main():
                 amp=float(rel['amplitude'][j]), phase=float(rel['phase'][j]), n=n,
                 c=float(v[(orders == n) & cos_rows].sum()), s=float(v[(orders == n) & ~cos_rows].sum()),
             ))
+        # ---- radiated pressure on a horizontal slice at 85% of the bowl height (model frame:
+        # z up along the glass axis, z = 0 at the bowl foot), one complex field per mode.
+        geo_name = f'shape_{int(table["shape"][i]):02d}.mechanics_geometry'
+        geo = arrays(root, geo_name)
+        H = float(table['height'][i])
+        ax = (np.arange(AIR_N) + 0.5) / AIR_N * 2 * AIR_HALF - AIR_HALF
+        X, Y = np.meshgrid(ax, ax, indexing='xy')                   # row = y, column = x
+        targets = np.column_stack((X.ravel(), Y.ravel(), np.full(X.size, 0.85 * H)))
+        fields = []
+        for j in range(len(rel['damped_frequency'])):
+            omega = 2 * np.pi * float(rel['frequency'][j])
+            fields.append(pressure_per_mode(geo, rel['eigenvectors'][:, j], omega, targets))
+            if air_check is None:
+                air_check = check_against_case(root, geo_name, geo, rel['eigenvectors'][:, j], omega, targets[:256])
+        P = np.stack(fields)                                         # (mode, point) Pa per unit q
+        # Pressure scale for display: the released modal amplitudes times these fields.
+        typical = np.abs((P * rel['amplitude'][:, None])).sum(0).max()
+        pscale = np.abs(P).max() / 32767
+        blob = np.stack((P.real, P.imag), -1)                        # (mode, point, 2)
+        (air_dir / f'{i:02d}.bin').write_bytes(np.round(blob / pscale).astype('<i2').tobytes())
+
         con = arrays(root, f'note_{i:02d}.contact')
         t = con['time']
         grid = np.linspace(0, WINDOW, SAMPLES)
@@ -102,6 +156,8 @@ def main():
                          overlap=r(lerp(con['overlap']), 12), q=r(q, 13), end_us=contact_end * 1e6,
                          peak_force=float(con['force'].max())),
             strike_angle=float(rmeta['actual_angles_rad'][0]), readout_angle=float(rmeta['actual_angles_rad'][1]),
+            air=dict(file=f'air/{i:02d}.bin', n=AIR_N, half=AIR_HALF, z=0.85 * H, scale=pscale, peak_pa=float(typical),
+                     layout='mode-major, rows = model y, columns = model x, (re, im) int16; Pa per unit modal coordinate'),
         ))
 
     bundle = dict(version=1, glasses=glasses,
@@ -111,7 +167,9 @@ def main():
     out.write_text(json.dumps(bundle, separators=(',', ':')))
     g0 = glasses[0]
     rim = sum(m['amp'] * np.hypot(m['c'], m['s']) for m in g0['modes'])
-    print(f'wrote {out} ({out.stat().st_size} B); basis check {worst:.1e}')
+    print(f'wrote {out} ({out.stat().st_size} B); basis check {worst:.1e}; '
+          f'pressure vs case _pressure: {"n/a (ag-physics not on path)" if air_check is None else f"{air_check:.1e}"}')
+    print(f"A4 pressure bound on slice: {glasses[0]['air']['peak_pa'] * 1e3:.3f} mPa")
     print(f"A4: contact {g0['contact']['end_us']:.1f} us, peak {g0['contact']['peak_force']:.3f} N, rim amplitude bound {rim*1e9:.2f} nm")
 
 

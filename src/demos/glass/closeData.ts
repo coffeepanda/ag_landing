@@ -18,6 +18,15 @@ export type CloseGlass = {
   contact: { t_us: number[]; force: number[]; mallet: number[]; overlap: number[]; q: number[]; end_us: number; peak_force: number }
   strike_angle: number
   readout_angle: number
+  /** Radiated pressure per mode on a horizontal slice (model frame, z up, foot at 0). */
+  air: { file: string; n: number; half: number; z: number; scale: number; peak_pa: number }
+}
+
+/** Per-mode complex pressure (Pa per unit modal coordinate), int16 re/im; loaded per glass. */
+export async function loadAirField(g: CloseGlass): Promise<Int16Array> {
+  const res = await fetch(`${import.meta.env.BASE_URL}demos/glass/${g.air.file}`)
+  if (!res.ok) throw new Error(`air field: HTTP ${res.status}`)
+  return new Int16Array(await res.arrayBuffer())
 }
 
 export type CloseBundle = { version: number; glasses: CloseGlass[]; mallet: { mass_kg: number; speed_m_s: number; stiffness_N_m: number } }

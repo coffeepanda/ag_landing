@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BehindPanel, BehindToggle, usePanelInset } from '../../components/BehindPanel'
 import { GlassAudio } from './audio'
-import { loadClose, RIM_VISUAL, rimBound, SLOW_RING, SLOW_STRIKE, type CloseBundle } from './closeData'
+import { loadAirField, loadClose, RIM_VISUAL, rimBound, SLOW_RING, SLOW_STRIKE, type CloseBundle } from './closeData'
 import ClosePlots from './ClosePlots'
 import type { CloseHud, CloseScene } from './closeScene'
 import { loadGlassSet, type Glass } from './data'
 import type { GlassViewProps } from './GlassDemo'
 
 const SIMULATED =
-  'One glass from the set, up close. From the bowl’s shape and the water inside, we computed the ways it can ring: rim shapes with two, three, four, five and six lobes, each at its own pitch. Then a small mallet strikes the rim, and we followed the contact, about forty millionths of a second long, to find how strongly each way of ringing is set going. Colour shows the bowl moving outward (amber) or inward (blue).'
+  'One glass from the set, up close. From the bowl’s shape and the water inside, we computed the ways it can ring: rim shapes with two, three, four, five and six lobes, each at its own pitch. Then a small mallet strikes the rim, and we followed the contact, about forty millionths of a second long, to find how strongly each way of ringing is set going. From the moving wall we computed the sound it sends into the air. On the glass, colour shows the wall moving out (amber) or in (blue); on the slice of air around it, pressure pushing (amber) or pulling (blue).'
 
 const FAMILIES: (number | null)[] = [null, 2, 3, 4, 5, 6]
 
@@ -23,6 +23,8 @@ export default function CloseView({ panel: { open, close, toggle }, switcher }: 
   const [error, setError] = useState<string | null>(null)
   const [index, setIndex] = useState(0)
   const [family, setFamily] = useState<number | null>(null)
+  const [airOn, setAirOn] = useState(true)
+  const [air, setAir] = useState<Int16Array | null>(null)
   const indexRef = useRef(0)
   indexRef.current = index
   const tRef = useRef(0)
@@ -74,6 +76,23 @@ export default function CloseView({ panel: { open, close, toggle }, switcher }: 
   const setInset = useCallback((r: number, b: number) => sceneRef.current?.setInset(r, b), [])
   usePanelInset(panelRef, open, setInset, data)
   useEffect(() => sceneRef.current?.setFamily(family), [family, data])
+  useEffect(() => sceneRef.current?.setAirVisible(airOn), [airOn, data])
+
+  // Radiated pressure fields for the shown glass, fetched on demand.
+  useEffect(() => {
+    const g = data?.glasses[index]
+    if (!g) return
+    let stale = false
+    setAir(null)
+    loadAirField(g)
+      .then((a) => {
+        if (stale) return
+        setAir(a)
+        sceneRef.current?.setAir(g, a)
+      })
+      .catch((e: unknown) => console.error('[glass air]', e))
+    return () => { stale = true }
+  }, [data, index])
 
   const pick = (i: number) => {
     if (!data) return
@@ -126,7 +145,8 @@ export default function CloseView({ panel: { open, close, toggle }, switcher }: 
     'A simplified, straight-walled bowl whose bending shapes are prescribed; the water adds mass in a simplified way.',
     'The mallet’s tip stiffness and the glass’s damping are chosen, not measured.',
     `Motion is magnified about ${magnify.toLocaleString()}×. The strike is replayed ${SLOW_STRIKE.toLocaleString()}× slower and the ringing ${SLOW_RING}× slower; the ringing keeps its true pitch ratios.`,
-    'The sound is the rim’s motion played at real speed, not a microphone recording.'
+    'The sound in the air comes from a simplified radiation model: every patch of the wall acts as a small source. The glass does not reflect the sound it makes.',
+    'What you hear is the rim’s motion played at real speed, not a microphone recording.'
   ]
 
   return (
@@ -149,11 +169,14 @@ export default function CloseView({ panel: { open, close, toggle }, switcher }: 
         <button className="btn" onClick={() => { ensureAudio(); sceneRef.current?.strike() }} disabled={!data}>
           Strike
         </button>
+        <button className={`btn ${airOn ? 'is-on-gold' : ''}`} onClick={() => setAirOn((a) => !a)} aria-pressed={airOn}>
+          Air
+        </button>
         <BehindToggle open={open} onToggle={toggle} />
         <span ref={hudRef} className="hint close-hud" aria-live="off" />
       </div>
       <BehindPanel ref={panelRef} open={open} onClose={close} simulated={SIMULATED} assumed={assumed}>
-        <ClosePlots glass={glass} getTime={getTime} family={family} open={open} />
+        <ClosePlots glass={glass} air={air} getTime={getTime} family={family} open={open} />
       </BehindPanel>
     </>
   )

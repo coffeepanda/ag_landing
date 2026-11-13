@@ -58,6 +58,33 @@ Its Behind-the-scene plots (`src/demos/glass/Plots.tsx`): the struck glass's
 spectrum (each mode decaying at its own rate), water depth against pitch for both
 bowl designs, the 2–6-lobe ring shapes, and the mallet contact force (~40 µs).
 
+### Singing Glass: "Up close"
+
+A switch on the glass page (*The set* / *Up close*) opens one glass with its simulated
+physics, from the same `final_scale` result:
+
+```powershell
+python tools/export_glass_closeup.py <ag-physics>/demos/05-singing-glass/runs/<final-scale-result>
+```
+
+(with ag-physics on `PYTHONPATH` the exporter also cross-checks the pressure against the
+case's own `simulation._pressure`; it writes `public/demos/glass/closeup.json` and one
+`public/demos/glass/air/NN.bin` per glass, fetched only when that glass is shown.)
+
+- **Wall field:** each mode's displacement is rebuilt from the model's prescribed basis
+  `(z/H)^2 [cos/sin(n theta) e_r + tangential/n]` and its saved mass-normalised eigenvector
+  (the exporter checks the analytic basis against the saved one, ~3e-15). The bowl
+  moves by this field and is coloured by radial displacement; motion is magnified ~×1 000.
+- **Strike:** the saved mallet contact (60 µs window: force, mallet position and all 10
+  modal coordinates) replays 40 000× slower; the glass then rings with the released
+  amplitudes, phases and decay rates, 800× slower, at true pitch ratios.
+- **Air:** the radiated pressure of each mode on a horizontal slice through the bowl,
+  from the case's surface-source surrogate `p = -rho w^2/(4 pi) sum A v_n e^{ikR}/R` over the
+  1 280 saved wall patches (matches `simulation._pressure` to ~5e-16). The page combines
+  the modes with the same phasors as the wall, so sound and motion stay in step.
+- **Plots** (`ClosePlots.tsx`): strike force, how each ring shape builds during the
+  contact, energy per ring shape, and an RMS pressure map ("sound around the glass").
+
 ### Last Leaf bundle
 
 Source: a completed `leaf_fall.flexible` natural-leaf flight (the canonical
