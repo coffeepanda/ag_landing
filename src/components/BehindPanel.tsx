@@ -60,9 +60,12 @@ export const BehindPanel = forwardRef<HTMLElement, Props>(function BehindPanel(
   )
 })
 
-/** Every phenomenon opens with its Behind-the-scene panel showing. */
+/**
+ * Behind the scene starts open on wide screens and closed on phones, where the
+ * sheet would cover most of the scene. Visitors can toggle it either way.
+ */
 export function useBehindPanel() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(() => !window.matchMedia('(max-width: 720px)').matches)
   const close = useCallback(() => setOpen(false), [])
   const toggle = useCallback(() => setOpen((o) => !o), [])
   return { open, close, toggle }
