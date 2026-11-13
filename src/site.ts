@@ -34,7 +34,8 @@ export const DEMOS: Demo[] = [
     num: '01',
     label: 'Light',
     title: ['A Room Made of ', 'Light'],
-    line: 'A sunbeam passes a fine grating and comes apart into colour.'
+    line: 'A sunbeam passes a fine grating and comes apart into colour.',
+    load: () => import('./demos/light/LightDemo')
   },
   {
     id: 'leaf',

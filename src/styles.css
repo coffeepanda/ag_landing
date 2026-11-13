@@ -413,6 +413,108 @@ a.tab:hover { color: var(--ink); }
 .view-switch button.is-active { color: #120d08; background: var(--gold); }
 .view-switch button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 
+/* Spectrum picker: seven colours plus All / White */
+.spectrum {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+}
+.spectrum-all {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.spectrum-all.is-active { color: #120d08; background: var(--ink); }
+.spectrum-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--c);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+}
+.spectrum-dot:hover { opacity: 0.9; }
+.spectrum-dot.is-active { opacity: 1; transform: scale(1.2); box-shadow: 0 0 0 2px #000, 0 0 0 3px var(--c); }
+.spectrum button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+
+/* Labelled slider (e.g. Sun height) */
+.slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.slider input[type='range'] {
+  width: 110px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+}
+.slider input[type='range']::-webkit-slider-runnable-track { height: 1px; background: var(--faint); }
+.slider input[type='range']::-moz-range-track { height: 1px; background: var(--faint); }
+.slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.slider input[type='range']::-moz-range-thumb { width: 11px; height: 11px; border: 0; border-radius: 50%; background: var(--gold); }
+.slider-v { color: var(--ink); min-width: 28px; letter-spacing: 0.04em; }
+
+/* Grating HUD */
+.wave-hud { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.wave-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  white-space: nowrap;
+  text-shadow: 0 0 6px #000;
+}
+.wave-label.is-order { color: var(--ink); font-size: 11px; }
+.wave-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(244, 239, 230, 0.7);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  text-align: center;
+  line-height: 18px;
+}
+
 /* Close-up HUD: scale bar projected from the scene */
 .air-hud { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .scale-bar {

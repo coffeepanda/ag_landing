@@ -22,7 +22,7 @@ three.js is loaded only with a demo; the hero page stays React-only.
 
 | Phenomenon | Status | Code | Data |
 |---|---|---|---|
-| 01 Light | placeholder | — | — |
+| 01 Light | live | `src/demos/light/` | `public/demos/light/` |
 | 02 Leaf | live | `src/demos/leaf/` | `public/demos/leaf/leaf.json` |
 | 03 Glass | live | `src/demos/glass/` | `public/demos/glass/glass.json` |
 
@@ -99,3 +99,35 @@ accepted step with its elastic part after a rigid fit. The page streams particle
 through the frozen 6 ms field (slowed), shows the speed or pressure slice, and can
 magnify the leaf's elastic bending ×100. Plots (`AirPlots.tsx`): slice speed and
 pressure with the leaf's cross-section, how the leaf gives way, and the air's push.
+
+### Room of Light bundle
+
+Source: the `room_light` reference grating solved with the README's wide-slit room
+stage (`aperture_width=0.6`, reusing the same grating). Export with ag-physics on
+`PYTHONPATH` (the grating field is sampled from the saved RCWA reconstruction payload):
+
+```powershell
+python tools/export_light.py <ag-physics>/demos/03-room-of-light/runs/<wide-slit-result>
+```
+
+Two views share one colour selection:
+
+- **The grating**: the exact time-harmonic TE field `Re(Ey e^{-iwt})` over one period,
+  for each of the seven solved colours, in a WebGL shader. Inside the ridged layer it is
+  sampled from the saved reconstruction; in the glass and air it is the Rayleigh sum of
+  all saved complex order amplitudes. The exporter checks the two agree at both faces
+  (about 1e-14). "White" draws all seven together, each at its own rhythm.
+- **The room**: a continuous-spectrum rainbow traced in the browser
+  (`src/demos/light/rainbow.ts`). Angles are exact from the grating equation; order
+  strengths are the simulated RCWA efficiencies (TE/TM mean) interpolated between the
+  seven colours; the source is the same 5778 K shape through the same 60 cm × 2 cm slit.
+  The window is placed high on the far wall and tilted for the view (light still meets
+  the grating straight on); "Sun height" tilts it live. Each diffracted order is one
+  energy-conserving sheet across wavelength; the sculpture and pedestal are lit per
+  pixel by the exact wavelength interval the slit admits. Bloom is display only.
+
+Sculpture: CC0 *Head of Doryphoros* plaster-cast scan (Museum of the Academy of Fine
+Arts in Kraków, via Wirtualne Muzea Małopolski; Zenodo record 21530396). Converted with
+`node tools/export_sculpture.mjs <…_normalized-0.250.glb>` (checksum-verified, Draco decoded
+with three's bundled decoder, textures dropped) into `public/demos/light/sculpture.bin`.
+
