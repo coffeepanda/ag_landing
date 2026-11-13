@@ -41,7 +41,8 @@ export const DEMOS: Demo[] = [
     num: '02',
     label: 'Leaf',
     title: ['The Last ', 'Leaf'],
-    line: 'A leaf lets go, and the air decides how it falls.'
+    line: 'A leaf lets go, and the air decides how it falls.',
+    load: () => import('./demos/leaf/LeafDemo')
   },
   {
     id: 'glass',

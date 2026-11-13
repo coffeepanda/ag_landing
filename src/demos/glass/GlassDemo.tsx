@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BehindPanel, BehindToggle } from '../../components/BehindPanel'
+import { BehindPanel, BehindToggle, useBehindPanel, usePanelInset } from '../../components/BehindPanel'
 import { GlassAudio } from './audio'
 import { loadGlassSet, type Glass } from './data'
 import GlassPlots from './Plots'
@@ -45,31 +45,17 @@ export default function GlassDemo() {
   const [sound, setSound] = useState(true)
   const [playing, setPlaying] = useState(false)
   const [touched, setTouched] = useState(false)
-  const [panel, setPanel] = useState(false)
+  const { open: panel, close: closePanel, toggle: togglePanel } = useBehindPanel()
   const [strikeUs, setStrikeUs] = useState<number[]>([])
   const panelRef = useRef<HTMLElement>(null)
   const soundRef = useRef(sound)
   soundRef.current = sound
 
   const getFocus = useCallback(() => sceneRef.current?.latest() ?? null, [])
-  const closePanel = useCallback(() => setPanel(false), [])
 
   // Keep the glasses centred in whatever the panel leaves uncovered.
-  useEffect(() => {
-    const fit = () => {
-      const s = sceneRef.current
-      const el = panelRef.current
-      const stage = el?.offsetParent as HTMLElement | null
-      if (!s || !el || !stage) return
-      if (!panel) return s.setInset(0, 0)
-      const sheet = window.matchMedia('(max-width: 720px)').matches
-      if (sheet) s.setInset(0, stage.clientHeight - el.offsetTop)
-      else s.setInset(stage.clientWidth - el.offsetLeft, 0)
-    }
-    fit()
-    window.addEventListener('resize', fit)
-    return () => window.removeEventListener('resize', fit)
-  }, [panel, glasses])
+  const setInset = useCallback((r: number, b: number) => sceneRef.current?.setInset(r, b), [])
+  usePanelInset(panelRef, panel, setInset, glasses)
 
   // Scene: data + WebGL. three.js is only loaded with this demo.
   useEffect(() => {
@@ -230,7 +216,7 @@ export default function GlassDemo() {
         <button className={`btn ${sound ? '' : 'is-off'}`} onClick={() => setSound((s) => !s)} aria-pressed={sound}>
           Sound {sound ? 'on' : 'off'}
         </button>
-        <BehindToggle open={panel} onToggle={() => setPanel((p) => !p)} />
+        <BehindToggle open={panel} onToggle={togglePanel} />
         <span className={`hint ${touched ? 'is-faded' : ''}`}>
           <span className="hint-fine">Click a glass, or drag across them · keys 1 – =</span>
           <span className="hint-coarse">Tap a glass, or slide across them</span>

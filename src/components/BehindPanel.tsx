@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, type ReactNode } from 'react'
+import { forwardRef, useCallback, useEffect, useState, type ReactNode, type RefObject } from 'react'
 
 /**
  * "Behind the scene": the same three parts for every phenomenon —
@@ -59,6 +59,39 @@ export const BehindPanel = forwardRef<HTMLElement, Props>(function BehindPanel(
     </aside>
   )
 })
+
+/** Every phenomenon opens with its Behind-the-scene panel showing. */
+export function useBehindPanel() {
+  const [open, setOpen] = useState(true)
+  const close = useCallback(() => setOpen(false), [])
+  const toggle = useCallback(() => setOpen((o) => !o), [])
+  return { open, close, toggle }
+}
+
+/**
+ * Report how much of the stage the open panel covers (px from the right on
+ * desktop, from the bottom on phones) so a scene can re-centre into the rest.
+ */
+export function usePanelInset(
+  panelRef: RefObject<HTMLElement>,
+  open: boolean,
+  setInset: (right: number, bottom: number) => void,
+  ready: unknown
+) {
+  useEffect(() => {
+    const fit = () => {
+      const el = panelRef.current
+      const stage = el?.offsetParent as HTMLElement | null
+      if (!el || !stage) return
+      if (!open) return setInset(0, 0)
+      if (window.matchMedia('(max-width: 720px)').matches) setInset(0, stage.clientHeight - el.offsetTop)
+      else setInset(stage.clientWidth - el.offsetLeft, 0)
+    }
+    fit()
+    window.addEventListener('resize', fit)
+    return () => window.removeEventListener('resize', fit)
+  }, [panelRef, open, setInset, ready])
+}
 
 export function BehindToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
