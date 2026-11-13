@@ -33,7 +33,7 @@ Each bundle holds only what the page draws or plays. It is exported from a saved
 ag-physics result; the native data, receipts and setup never ship.
 
 Each phenomenon has a **Behind the scene** panel (`src/components/BehindPanel.tsx`),
-open by default (`useBehindPanel()`); `usePanelInset()` lets the scene re-centre
+open by default on wide screens and closed on phones (`useBehindPanel()`); `usePanelInset()` lets the scene re-centre
 into the area the panel leaves uncovered. The panel shows
 what is simulated, what is assumed, and two to four live plots that follow what the
 visitor does. It stays at that level: results and honest assumptions, no solver,

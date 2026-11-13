@@ -23,6 +23,8 @@ body {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  /* Phones flash a highlight over anything tappable; controls have their own states. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 a { color: inherit; }
@@ -246,6 +248,10 @@ a.tab:hover { color: var(--ink); }
   display: block;
   touch-action: none;
   outline: none;
+  /* Phones: no selection or callout when tapping the scene. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .demo-copy {
