@@ -7,7 +7,8 @@ import type { Face, Room, Sculpture } from './data'
 import { buildRainbow, LMAX, LMIN, makeWindow, spectralTable, type RainbowBuild } from './rainbow'
 
 const toThree = (x: number, y: number, z: number, out = new THREE.Vector3()) => out.set(x, z, -y)
-const GAIN = 0.3 // display: W/m^2 -> linear radiance, shared by every lit surface
+const GAIN = 0.3 // display: W/m^2 -> linear radiance for the sculpture and pedestal
+const SURFACE = 0.48 // display: room surfaces get a softer share, so the rainbow doesn't glare
 const DEFAULT_TILT = 40
 const PEDESTAL = { half: 0.15, height: 1.0 }
 
@@ -41,6 +42,7 @@ export class RoomScene {
     uSelAmt: { value: 0 },
     uReveal: { value: LMIN - 30 },
     uGain: { value: GAIN },
+    uSurface: { value: SURFACE },
     uTime: { value: 0 },
     uShow: { value: 1 }
   }
@@ -129,14 +131,14 @@ export class RoomScene {
       uniforms: this.shared,
       vertexShader: `
         attribute vec3 tint; attribute float energy; attribute float lam;
-        uniform float uSel; uniform float uSelAmt; uniform float uReveal; uniform float uGain;
+        uniform float uSel; uniform float uSelAmt; uniform float uReveal; uniform float uGain; uniform float uSurface;
         varying vec3 vCol;
         float mask(float l) {
           float m = mix(1.0, mix(0.04, 1.0, exp(-pow((l - uSel) / 16.0, 2.0))), uSelAmt);
           return m * smoothstep(uReveal, uReveal - 25.0, l);
         }
         void main() {
-          vCol = tint * energy * uGain * mask(lam);
+          vCol = tint * energy * uGain * uSurface * mask(lam);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: `varying vec3 vCol; void main() { gl_FragColor = vec4(vCol, 1.0); }`
@@ -170,7 +172,7 @@ export class RoomScene {
 
     this.composer = new EffectComposer(this.renderer)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.5, 0.4, 0.45)
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.36, 0.5, 0.55)
     this.composer.addPass(this.bloom)
     this.composer.addPass(new OutputPass())
 

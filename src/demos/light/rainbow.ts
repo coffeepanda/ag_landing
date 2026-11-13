@@ -15,6 +15,7 @@ export const LMIN = 400
 export const LMAX = 700
 const SAMPLES = 110
 const SEGMENTS = 22
+const FEATHER = 4 // stations over which each patch's ends fade in
 const ORDERS = [-2, -1, 0, 1, 2]
 
 export type Window = {
@@ -182,6 +183,11 @@ export function buildRainbow(room: Room, tiltDeg: number, occluders: Face[] = []
     return [c * win.n[0] + s * win.g[0], c * win.n[1] + s * win.g[1], c * win.n[2] + s * win.g[2]]
   }
   const along = (k: number) => add(win.center, win.a, (k / SEGMENTS - 0.5) * win.length)
+  // Display: soften the ends of the slit's image so patches fade out like diffuse light.
+  const feather = (k: number) => {
+    const x = Math.min(1, Math.min(k, SEGMENTS - k) / FEATHER)
+    return x * x * (3 - 2 * x)
+  }
   const pushVertex = (h: NonNullable<Hit>, rgb: V, rho: number, e: number, l: number, lift: number) => {
     const f = faces[h.face]!
     pos.push(h.p[0] + f.normal[0]! * lift, h.p[1] + f.normal[1]! * lift, h.p[2] + f.normal[2]! * lift)
@@ -234,10 +240,11 @@ export function buildRainbow(room: Room, tiltDeg: number, occluders: Face[] = []
         const e = strip / area
         const base = pos.length / 3
         const lift = 0.002 + (Math.abs(m) - 1) * 0.0004
-        pushVertex(q[0]!, ca, rhoOf(q[0]!.face, la), e, la, lift)
-        pushVertex(q[1]!, cb, rhoOf(q[1]!.face, lb), e, lb, lift)
-        pushVertex(q[2]!, ca, rhoOf(q[2]!.face, la), e, la, lift)
-        pushVertex(q[3]!, cb, rhoOf(q[3]!.face, lb), e, lb, lift)
+        const f0 = feather(k), f1 = feather(k + 1)
+        pushVertex(q[0]!, ca, rhoOf(q[0]!.face, la), e * f0, la, lift)
+        pushVertex(q[1]!, cb, rhoOf(q[1]!.face, lb), e * f0, lb, lift)
+        pushVertex(q[2]!, ca, rhoOf(q[2]!.face, la), e * f1, la, lift)
+        pushVertex(q[3]!, cb, rhoOf(q[3]!.face, lb), e * f1, lb, lift)
         index.push(base, base + 1, base + 2, base + 2, base + 1, base + 3)
       }
     }
@@ -261,7 +268,10 @@ export function buildRainbow(room: Room, tiltDeg: number, occluders: Face[] = []
       const q = [rows[k]![0]!, rows[k]![1]!, rows[k + 1]![0]!, rows[k + 1]![1]!]
       if (q.some((h) => !h) || new Set(q.map((h) => h!.face)).size > 1 || q[0]!.face >= drawn) continue
       const base = pos.length / 3
-      for (const h of q) pushVertex(h!, rgb, rhoOf(h!.face, 555), ((tw / (win.length * win.width)) * h!.cos), 555, 0.0025)
+      q.forEach((h, j) => {
+        const e = (tw / (win.length * win.width)) * h!.cos * feather(k + (j >> 1))
+        pushVertex(h!, rgb, rhoOf(h!.face, 555), e, 555, 0.0025)
+      })
       index.push(base, base + 1, base + 2, base + 2, base + 1, base + 3)
     }
   }
