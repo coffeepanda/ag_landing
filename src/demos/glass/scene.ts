@@ -474,7 +474,7 @@ function deform(
 }
 
 /** Half-section of a stemmed glass, outside then inside; y up from the table. */
-function glassProfile(R: number, H: number, t: number) {
+export function glassProfile(R: number, H: number, t: number) {
   const y0 = FOOT
   const pts: [number, number][] = [
     [0.0, 0.0], [0.031, 0.0], [0.034, 0.0008], [0.0345, 0.0018], [0.032, 0.0026],
@@ -489,7 +489,7 @@ function glassProfile(R: number, H: number, t: number) {
 }
 
 /** Reflection environment: a black room with a few soft panels, for crisp highlights on glass. */
-function darkStudio() {
+export function darkStudio() {
   const s = new THREE.Scene()
   s.background = new THREE.Color(0x020202)
   const panel = (w: number, h: number, color: number, k: number, pos: [number, number, number]) => {
@@ -507,7 +507,7 @@ function darkStudio() {
   return s
 }
 
-function glowTexture(rgb: [number, number, number]) {
+export function glowTexture(rgb: [number, number, number]) {
   const c = document.createElement('canvas')
   c.width = c.height = 128
   const g = c.getContext('2d')!

@@ -55,4 +55,4 @@ export const DEMOS: Demo[] = [
   }
 ]
 
-export const DEFAULT_DEMO = 'glass'
+export const DEFAULT_DEMO = 'light'

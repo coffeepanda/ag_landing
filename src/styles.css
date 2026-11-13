@@ -488,6 +488,33 @@ a.tab:hover { color: var(--ink); }
 .slider input[type='range']::-moz-range-thumb { width: 11px; height: 11px; border: 0; border-radius: 50%; background: var(--gold); }
 .slider-v { color: var(--ink); min-width: 28px; letter-spacing: 0.04em; }
 
+/* Glass picker for the close-up */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+.stepper span { min-width: 34px; text-align: center; }
+.stepper button {
+  background: none;
+  border: 0;
+  color: var(--dim);
+  font-size: 15px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.stepper button:hover { color: var(--gold); }
+.view-switch.families { flex-basis: auto; }
+.view-switch.families button { padding: 7px 11px; letter-spacing: 0.08em; }
+.close-hud { flex-basis: 100%; font-variant-numeric: tabular-nums; }
+
 /* Grating HUD */
 .wave-hud { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .wave-label {
