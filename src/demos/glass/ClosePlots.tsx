@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import type { CloseGlass } from './closeData'
-import { plot } from '../../theme/look'
+import { plot } from '../../theme/plot'
 
 const ink = (a: number) => `rgba(${plot.ink},${a})`
 const gold = (a: number) => `rgba(${plot.accent},${a})`

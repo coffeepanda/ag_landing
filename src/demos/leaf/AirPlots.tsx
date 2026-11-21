@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import { deltaColor, pressureColor, type Air } from './airData'
-import { plot } from '../../theme/look'
+import { plot } from '../../theme/plot'
 
 const ink = (a: number) => `rgba(${plot.ink},${a})`
 const gold = (a: number) => `rgba(${plot.accent},${a})`

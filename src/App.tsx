@@ -1,4 +1,3 @@
-import LookSwitch from './components/LookSwitch'
 import Nav from './components/Nav'
 import Home from './pages/Home'
 import Phenomena from './pages/Phenomena'
@@ -13,7 +12,6 @@ export default function App() {
     <>
       <Nav route={route} />
       {phenomena ? <Phenomena demoId={route.demo} /> : <Home />}
-      <LookSwitch />
     </>
   )
 }

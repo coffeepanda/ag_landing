@@ -5,7 +5,6 @@ import { PHENOMENA, SECTIONS } from '../site'
 export default function Nav({ route }: { route: Route }) {
   return (
     <header className="nav">
-      <div className="nav-card">
       <a className="mark" href={href('')} aria-label="AG home">
         <LightCone />
         <span className="logo">AG</span>
@@ -31,7 +30,6 @@ export default function Nav({ route }: { route: Route }) {
           )
         })}
       </nav>
-      </div>
     </header>
   )
 }

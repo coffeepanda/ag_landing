@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import type { Glass } from './data'
-import { plot } from '../../theme/look'
+import { plot } from '../../theme/plot'
 
 type Focus = { i: number; tau: number } | null
 

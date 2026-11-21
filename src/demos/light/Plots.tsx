@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import { css, orderAngle, type Room } from './data'
-import { plot } from '../../theme/look'
+import { plot } from '../../theme/plot'
 
 const ink = (a: number) => `rgba(${plot.ink},${a})`
 
