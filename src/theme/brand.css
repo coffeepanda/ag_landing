@@ -317,3 +317,106 @@ a.tab:hover { background: var(--agp-hover); }
 @media (prefers-reduced-motion: reduce) {
   .live-dot { animation: none; }
 }
+
+/* ---------- PROTOTYPE: home layouts (html[data-home]) ---------- */
+/* Landscape only; phones and portrait screens keep the stacked layout above. */
+
+@media (min-width: 721px) and (min-aspect-ratio: 4/5) {
+  /* 2 · Fill the column: the frame takes the column's full width and as much height as it can,
+   * cropping the video up to a 4:5 portrait shape. No paper above or below it. */
+  [data-home='fill'] .stage {
+    --vid-w: var(--area-w);
+    --vid-h: min(var(--area-h), var(--area-w) * 5 / 4);
+  }
+
+  /* 3 · Cinema band: the video spans the page; the headline (one line) and the footer share a
+   * baseline under it. */
+  [data-home='cinema'] .stage {
+    --title-size: clamp(40px, 5.4vw, 88px);
+    --text-h: calc(var(--title-size) * 0.95 + 28px);
+    --vid-w: calc(100vw - 2 * var(--edge));
+    --vid-h: calc(var(--area-h) - var(--text-h));
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+  }
+  [data-home='cinema'] .void,
+  [data-home='cinema'] .vignette { top: var(--area-top); }
+  [data-home='cinema'] .title { grid-row: 2; grid-column: 1; align-self: end; font-size: var(--title-size); white-space: nowrap; }
+  [data-home='cinema'] .title em { display: inline; }
+  [data-home='cinema'] .foot { grid-row: 2; grid-column: 2; align-self: end; align-items: flex-end; text-align: right; }
+
+  /* 4 · Headline inside the frame: the frame fills the page above a one-line footer, and the
+   * headline sits in the video's lower left, in light ink. */
+  [data-home='frame'] .stage {
+    --foot-h: 40px;
+    --vid-w: calc(100vw - 2 * var(--edge));
+    --vid-h: calc(var(--area-h) - var(--foot-h));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr var(--foot-h);
+  }
+  [data-home='frame'] .void,
+  [data-home='frame'] .vignette { top: var(--area-top); }
+  [data-home='frame'] .vignette {
+    background:
+      radial-gradient(ellipse at 50% 45%, transparent 50%, rgb(0 0 0 / 0.35) 100%),
+      linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 45%);
+  }
+  [data-home='frame'] .title {
+    --ink: #ECEBE6;
+    --dim: rgb(236 235 230 / 0.62);
+    --title-shadow: 0 0 40px rgb(0 0 0 / 0.6);
+    grid-row: 1;
+    align-self: end;
+    margin: 0 0 clamp(24px, 4vh, 48px) clamp(24px, 3vw, 48px);
+    font-size: clamp(48px, 7vw, 120px);
+  }
+  [data-home='frame'] .foot { grid-row: 2; flex-direction: row; justify-content: space-between; align-items: flex-end; }
+}
+
+/* Prototype switch: a small pill in the middle of the top bar. */
+.proto-switch {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 3px 2px 10px;
+  background: var(--agp-surface);
+  border: 1px solid var(--agp-line);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgb(16 17 20 / 0.06);
+}
+.proto-switch-k { font-size: 11px; font-weight: 600; color: var(--agp-muted); margin-right: 4px; }
+.proto-switch button {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--agp-muted);
+  font: 600 12px var(--mono);
+  cursor: pointer;
+}
+.proto-switch button:hover { background: var(--agp-hover); color: var(--agp-ink); }
+.proto-switch button.is-active { background: var(--agp-ink); color: var(--agp-canvas); }
+.proto-switch-name {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--agp-ink);
+  color: var(--agp-canvas);
+  font: 500 12px var(--sans);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--agp-motion-fast) var(--ease);
+}
+.proto-switch button:hover .proto-switch-name { opacity: 1; }
+@media (max-width: 720px), (max-aspect-ratio: 4/5) { .proto-switch { display: none; } }

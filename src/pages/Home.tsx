@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import HomeLayoutSwitch from '../components/HomeLayoutSwitch'
 import { CONTACT } from '../site'
 
 export default function Home() {
@@ -45,6 +46,7 @@ export default function Home() {
         <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
         <span>© {new Date().getFullYear()} AIperture. All rights reserved.</span>
       </footer>
+      <HomeLayoutSwitch />
     </main>
   )
 }
