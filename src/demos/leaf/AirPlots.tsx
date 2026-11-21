@@ -1,12 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import { deltaColor, pressureColor, type Air } from './airData'
+import { plot } from '../../theme/plot'
 
-const GOLD = '217,185,138'
-const INK = '244,239,230'
-const MONO = '"IBM Plex Mono", ui-monospace, monospace'
-const ink = (a: number) => `rgba(${INK},${a})`
-const gold = (a: number) => `rgba(${GOLD},${a})`
+const ink = (a: number) => `rgba(${plot.ink},${a})`
+const gold = (a: number) => `rgba(${plot.accent},${a})`
 
 /** Plots behind the close-up: slice maps, how the leaf gives way, and the air's push. */
 export default function AirPlots({ air }: { air: Air | null }) {
@@ -57,7 +55,7 @@ function prep(c: HTMLCanvasElement) {
   const g = c.getContext('2d')!
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   g.clearRect(0, 0, w, h)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   return { g, w, h }
 }
 

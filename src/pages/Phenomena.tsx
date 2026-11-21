@@ -51,7 +51,7 @@ export default function Phenomena({ demoId }: { demoId?: string }) {
           <p className="demo-line">{View ? demo.line : 'In preparation.'}</p>
         </div>
 
-        {View && <span className="demo-credit">Simulated with AG</span>}
+        {View && <span className="demo-credit"><i className="live-dot" aria-hidden="true" />Simulated with AG</span>}
       </section>
     </main>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import MysteryCode from '../components/MysteryCode'
 import { CONTACT } from '../site'
 
 export default function Home() {
@@ -37,9 +38,11 @@ export default function Home() {
       </video>
       <div className="vignette" aria-hidden="true" />
 
-      <h1 className="title">
-        Into The <em>Unknown</em>
-      </h1>
+      <MysteryCode>
+        <h1 className="title">
+          Into The <em>Unknown<i className="hero-caret" aria-hidden="true" /></em>
+        </h1>
+      </MysteryCode>
 
       <footer className="foot">
         <a href={`mailto:${CONTACT}`}>{CONTACT}</a>

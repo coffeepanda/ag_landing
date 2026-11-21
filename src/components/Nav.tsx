@@ -1,3 +1,4 @@
+import LightCone from './LightCone'
 import { href, type Route } from '../route'
 import { PHENOMENA, SECTIONS } from '../site'
 
@@ -5,6 +6,7 @@ export default function Nav({ route }: { route: Route }) {
   return (
     <header className="nav">
       <a className="mark" href={href('')} aria-label="AG home">
+        <LightCone />
         <span className="logo">AG</span>
         <span className="tag">Preview</span>
       </a>

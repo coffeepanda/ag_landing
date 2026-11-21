@@ -1,0 +1,395 @@
+/*
+ * AG brand layer over styles.css: the AG Physics Instrument palette, "bench and viewport".
+ * The page is bone paper with a hairline top bar. The video and every scene sit in one framed
+ * dark viewport, the instrument screen, and everything inside it (controls, HUD, Behind the
+ * scene) is dark chrome so the scene stays the brightest thing on screen.
+ *
+ * Components read semantic roles (--ink, --dim, --chip-bg …). This file sets them per surface.
+ * The accent (--live) is for live state only: playheads, focus, a struck glass, the live dot.
+ * Selected is ink.
+ */
+
+/* ---------- Surfaces ---------- */
+
+/* Paper: the page around the viewport. Instrument light. */
+:root {
+  --ink: var(--agp-ink);
+  --dim: var(--agp-muted);
+  --faint: color-mix(in srgb, var(--agp-muted) 62%, var(--agp-canvas));
+  --line: var(--agp-line);
+  --line-strong: var(--agp-line-strong);
+  --sel: var(--agp-ink);
+  --sel-bg: var(--agp-ink);
+  --on-sel: var(--agp-canvas);
+  --ring-gap: var(--agp-surface);
+  --chip-bg: var(--agp-surface);
+  --page-bg: var(--agp-canvas);
+  --live: var(--agp-accent);
+  --title-shadow: none;
+
+  /* Layout grid: everything lines up with the viewport's edges. */
+  --bar-h: 52px;
+  --edge: clamp(16px, 2.2vw, 28px);
+  --band: 104px;
+  --frame-top: calc(var(--bar-h) + var(--band));
+  --frame-r: var(--agp-radius-xl);
+  --screen: #0B0C0E;
+  color-scheme: light;
+}
+
+/* Dark: inside the viewport. Instrument dark, a step lighter than the scene so chrome reads as
+ * glass over it without competing. */
+.view-stage,
+.demo-loading,
+.demo-soon,
+.screen {
+  --ink: #ECEBE6;
+  --dim: rgb(236 235 230 / 0.6);
+  --faint: rgb(236 235 230 / 0.34);
+  --line: rgb(236 235 230 / 0.11);
+  --line-strong: rgb(236 235 230 / 0.26);
+  --sel: #ECEBE6;
+  --sel-bg: #ECEBE6;
+  --on-sel: #0C0D0F;
+  --ring-gap: #141518;
+  --chip-bg: rgb(22 23 26 / 0.72);
+  --hud-line: rgb(236 235 230 / 0.7);
+  --panel-bg: rgb(17 18 21 / 0.9);
+  --panel-solid: #111215;
+  --panel-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 16px 40px rgb(0 0 0 / 0.35);
+  --panel-p: rgb(236 235 230 / 0.82);
+  --panel-li: rgb(236 235 230 / 0.68);
+  --live: #F06A3C;
+  --agp-icon-accent: #F06A3C;
+  color-scheme: dark;
+  color: var(--ink);
+}
+
+html, body { background: var(--agp-canvas); }
+
+/* ---------- Type and controls ---------- */
+
+.tab { font-size: 13.5px; font-weight: 500; }
+.tab sup { font-size: 9.5px; font-weight: 500; vertical-align: 6px; }
+.chip-link { font-size: 13px; font-weight: 500; padding: 6px 12px; transition: color var(--agp-motion-fast) var(--ease), border-color var(--agp-motion-fast) var(--ease), background var(--agp-motion-fast) var(--ease); }
+.chip-link .num { font-family: var(--mono); font-size: 11px; }
+.btn { font-size: 13px; font-weight: 500; padding: 8px 15px; transition: border-color var(--agp-motion-fast) var(--ease), color var(--agp-motion-fast) var(--ease), background var(--agp-motion-fast) var(--ease); }
+.btn:hover { border-color: var(--line-strong); }
+.btn.is-on-gold, .behind-toggle.is-on { background: var(--sel-bg); border-color: var(--sel-bg); color: var(--on-sel); }
+.btn-icon { font-family: var(--mono); font-size: 11px; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.hint { font-size: 12.5px; }
+.view-switch button { font-size: 13px; font-weight: 500; padding: 6px 13px; }
+.view-switch.families button { padding: 6px 10px; }
+.spectrum-all { font-size: 12.5px; font-weight: 500; }
+.slider { font-size: 12.5px; font-weight: 500; }
+.slider-v, .timeline-t, .stepper span, .close-hud { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.demo-loading, .demo-soon { font-size: 13px; }
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live);
+  animation: breathe var(--agp-motion-breathe) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes breathe { 50% { opacity: 0.3; } }
+
+/* ---------- Top bar ---------- */
+
+.nav {
+  height: var(--bar-h);
+  padding: 0 var(--edge);
+  align-items: center;
+  background: color-mix(in srgb, var(--agp-canvas) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--agp-line);
+}
+.tag {
+  padding: 2px 7px;
+  margin-left: 2px;
+  border: 1px solid var(--agp-line);
+  border-radius: var(--agp-radius-pill);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--agp-muted);
+}
+.tabs { gap: 2px; margin-right: -11px; }
+.tab { padding: 6px 11px; border-radius: 8px; transition: color var(--agp-motion-fast) var(--ease), background var(--agp-motion-fast) var(--ease); }
+a.tab:hover { background: var(--agp-hover); }
+.tab::after { left: 11px; right: 11px; bottom: -11px; height: 1.5px; background: var(--agp-ink); transition: transform var(--agp-motion-slow) var(--ease); }
+
+/* ---------- The viewport ---------- */
+
+/* One frame for the video and every scene: same radius, same edge, same hairline. */
+.view-stage,
+.demo-loading,
+.demo-soon,
+.void,
+.vignette {
+  border-radius: var(--frame-r);
+}
+.view-stage,
+.demo-loading,
+.demo-soon,
+.void {
+  background: var(--screen);
+  box-shadow: 0 1px 2px rgb(16 17 20 / 0.06), 0 12px 32px rgb(16 17 20 / 0.08);
+}
+.view-stage,
+.demo-loading,
+.demo-soon {
+  inset: var(--frame-top) var(--edge) var(--edge);
+  overflow: hidden;
+}
+/* A hairline drawn over the scene so the frame edge stays crisp on bright frames. */
+.view-stage::after,
+.vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* ---------- Home: headline on paper, the video in the viewport ---------- */
+
+/*
+ * The video fills the right column between the bar and the footer line. It may crop, but never
+ * past a 4:5 portrait shape, and it never crosses the page's bottom edge.
+ * The stage is the viewport, so the sizes come from viewport units.
+ */
+.stage {
+  --col-gap: clamp(24px, 4vw, 64px);
+  --area-top: calc(var(--bar-h) + var(--edge));
+  --area-w: calc((100vw - 2 * var(--edge) - var(--col-gap)) * 7 / 12);
+  --area-h: calc(100svh - var(--bar-h) - 2 * var(--edge));
+  --vid-w: var(--area-w);
+  --vid-h: min(var(--area-h), var(--area-w) * 5 / 4);
+  padding: var(--area-top) var(--edge) var(--edge);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-rows: 1fr auto;
+  column-gap: var(--col-gap);
+}
+/* Centred on the column's height when the 4:5 limit leaves room, level with the headline. */
+.void,
+.vignette {
+  inset: calc(var(--area-top) + (var(--area-h) - var(--vid-h)) / 2) var(--edge) auto auto;
+  width: var(--vid-w);
+  height: var(--vid-h);
+}
+.vignette { background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(0 0 0 / 0.35) 100%); }
+.hero {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  justify-self: start;
+  align-self: center;
+}
+.title {
+  text-align: left;
+  font-size: clamp(48px, 6.6vw, 108px);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+.title em { display: block; }
+
+/* Mystery code: hovering the headline reveals a snippet under it. It is laid out out of flow,
+ * so revealing it never moves the headline. */
+.hero {
+  /* Room for up to four snippet lines is reserved below the headline, so headline and snippet
+   * are centred together and the snippet never reaches the footer on short screens. */
+  --snip-gap: clamp(20px, 3vh, 32px);
+  --snip-size: clamp(11.5px, 0.95vw, 13.5px);
+  justify-self: stretch;
+  margin-bottom: calc(var(--snip-gap) + 4 * 1.7 * var(--snip-size));
+  outline: none;
+  cursor: default;
+}
+.hero-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.72em;
+  margin-left: 0.08em;
+  vertical-align: -0.02em;
+  background: var(--agp-line-strong);
+  animation: caret 1.1s steps(1) infinite;
+  transition: opacity var(--agp-motion-base) var(--ease);
+}
+.hero:hover .hero-caret,
+.hero.is-open .hero-caret { background: var(--live); }
+.hero.is-open .hero-caret { animation: none; opacity: 0; }
+.hero:focus-visible .title { outline: 1px solid var(--live); outline-offset: 8px; border-radius: 4px; }
+
+.mystery {
+  position: absolute;
+  left: 0;
+  top: calc(100% + var(--snip-gap));
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--snip-size);
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+  color: var(--agp-muted);
+  white-space: pre;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--agp-motion-base) var(--ease), transform var(--agp-motion-base) var(--ease);
+}
+.hero.is-open .mystery { opacity: 1; transform: none; }
+.mc-k { color: var(--agp-ink); }
+.mc-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.2em;
+  background: var(--live);
+}
+.mc-caret.is-idle { animation: caret 1.1s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Equations: one every 0.5 s while the headline is hovered. Each fades in; none fades out. */
+.eq { display: inline-block; white-space: nowrap; animation: eq-in var(--agp-motion-fast) var(--ease) both; }
+@keyframes eq-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+/* The argument of simulate(…) becomes the law being solved. */
+.mc-s { color: var(--agp-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-caret, .mc-caret.is-idle, .eq { animation: none; }
+  .mystery { transition: none; transform: none; }
+}
+.foot {
+  grid-column: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+}
+.foot a { border-color: var(--agp-line-strong); }
+.foot a:hover { border-color: var(--agp-ink); }
+
+/* ---------- Phenomena: a header band on paper, the scene below ---------- */
+
+.demo-copy {
+  left: var(--edge);
+  top: calc(var(--bar-h) + 22px);
+  max-width: min(720px, calc(100% - 2 * var(--edge) - 300px));
+}
+.demo-title { font-size: clamp(28px, 3vw, 40px); line-height: 1.05; }
+.demo-line { margin-top: 8px; font-size: 15px; line-height: 1.4; }
+
+.strip {
+  top: calc(var(--bar-h) + 24px);
+  right: var(--edge);
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--agp-line);
+  border-radius: var(--agp-radius-pill);
+  background: var(--agp-inset);
+}
+.chip-link { border-color: transparent; background: none; backdrop-filter: none; color: var(--agp-muted); }
+.chip-link:hover { color: var(--agp-ink); border-color: transparent; background: var(--agp-hover); }
+.chip-link .num { color: color-mix(in srgb, var(--agp-muted) 70%, var(--agp-canvas)); }
+.chip-link.is-active {
+  color: var(--agp-ink);
+  background: var(--agp-surface);
+  border-color: var(--agp-line);
+  box-shadow: 0 1px 2px rgb(16 17 20 / 0.06);
+}
+.chip-link.is-active .num { color: var(--agp-muted); }
+
+/* Sits under the picker, on the same line as the tagline. */
+.demo-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  top: calc(var(--bar-h) + 70px);
+  bottom: auto;
+  right: calc(var(--edge) + 4px);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--agp-muted);
+}
+
+/* ---------- Inside the viewport ---------- */
+
+.demo-controls { left: 16px; right: 16px; bottom: 16px; }
+@media (min-width: 721px) {
+  .demo-stage:has(.behind.is-open) .demo-controls { right: calc(min(372px, 40vw) + 28px); }
+}
+.btn, .view-switch, .spectrum, .slider, .stepper { border-color: var(--line); }
+
+.behind {
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: min(372px, 40vw);
+  border-radius: var(--agp-radius-lg);
+  border-color: var(--line);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.behind-head { padding: 12px 12px 10px 18px; }
+.behind-kicker { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.behind-body { padding: 2px 18px 20px; }
+.behind-body h3 { font-size: 11.5px; font-weight: 600; color: var(--dim); letter-spacing: 0.02em; margin-top: 18px; }
+.behind-body p { font-size: 13px; }
+.behind-body li { font-size: 12.5px; }
+.behind-body li::before { background: var(--faint); opacity: 1; }
+.fig-title { font-size: 12px; font-weight: 500; }
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 720px) {
+  :root { --edge: 12px; --bar-h: 88px; --band: 112px; --frame-r: var(--agp-radius-lg); }
+
+  /* Bar: the mark, then the tabs as an underlined row. */
+  .nav { flex-direction: column; align-items: stretch; justify-content: flex-end; gap: 6px; padding-top: 12px; }
+  .mark { padding-left: 2px; }
+  .tabs { gap: 0; margin: 0 -8px; }
+  .tab { padding: 8px 8px 10px; font-size: 13.5px; }
+  .tab::after { bottom: 0; left: 8px; right: 8px; }
+  a.tab:hover { background: none; }
+
+  .strip { top: calc(var(--bar-h) + 12px); left: var(--edge); right: auto; }
+  .demo-copy { top: calc(var(--bar-h) + 56px); max-width: calc(100% - 2 * var(--edge)); }
+  .demo-title { font-size: 25px; }
+  .demo-line { margin-top: 4px; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .demo-stage:has(.behind.is-open) .demo-copy { opacity: 1; }
+  .demo-credit { display: none; }
+
+  .demo-controls { left: 10px; right: 10px; bottom: 10px; }
+  .behind { top: auto; left: 0; right: 0; bottom: 0; width: auto; border-radius: var(--agp-radius-lg) var(--agp-radius-lg) 0 0; }
+  .demo-stage:has(.behind.is-open) .demo-controls { left: 0; right: 0; bottom: 0; }
+}
+
+/* Phones and portrait screens: the video on top, full width, the headline under it.
+ * Here the frame is taller than 16:9 on purpose (a cinematic crop), but never more than
+ * 56% of the screen, so the headline and footer always fit below it. */
+@media (max-width: 720px), (max-aspect-ratio: 4/5) {
+  .stage {
+    --vid-w: calc(100vw - 2 * var(--edge));
+    --vid-h: min(56svh, max(var(--vid-w) * 9 / 16, 44svh));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    padding-top: calc(var(--area-top) + var(--vid-h) + 24px);
+  }
+  .void, .vignette { inset: var(--area-top) var(--edge) auto var(--edge); }
+  .hero { grid-row: 1; align-self: start; margin-bottom: 0; }
+  /* Stacked: the snippet takes its own space under the headline (tap to reveal). */
+  .mystery { position: static; margin-top: 18px; max-height: 0; overflow: hidden; transition: opacity var(--agp-motion-base) var(--ease), max-height var(--agp-motion-slow) var(--ease); }
+  .hero.is-open .mystery { max-height: 9em; }
+  .title { font-size: clamp(44px, 9vw, 88px); }
+  .foot { grid-row: 2; align-self: end; text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}

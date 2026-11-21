@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import type { CloseGlass } from './closeData'
+import { plot } from '../../theme/plot'
 
-const INK = '244,239,230'
-const GOLD = '217,185,138'
-const MONO = '"IBM Plex Mono", ui-monospace, monospace'
-const ink = (a: number) => `rgba(${INK},${a})`
-const gold = (a: number) => `rgba(${GOLD},${a})`
-const FAMILY = ['rgba(217,185,138,1)', 'rgba(150,190,230,1)', 'rgba(140,210,170,1)', 'rgba(230,140,120,1)', 'rgba(190,160,230,1)']
+const ink = (a: number) => `rgba(${plot.ink},${a})`
+const gold = (a: number) => `rgba(${plot.accent},${a})`
+const FAMILY = [`rgba(${plot.accent},1)`, 'rgba(150,190,230,1)', 'rgba(140,210,170,1)', 'rgba(230,140,120,1)', 'rgba(190,160,230,1)']
 
 function hz(f: number) {
   return f >= 1000 ? `${(f / 1000).toFixed(1)}k` : `${Math.round(f)}`
@@ -91,7 +89,7 @@ function prep(c: HTMLCanvasElement) {
   const g = c.getContext('2d')!
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   g.clearRect(0, 0, w, h)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   return { g, w, h }
 }
 
@@ -130,7 +128,7 @@ function drawStrike(c: HTMLCanvasElement, glass: CloseGlass, tUs: number) {
   if (tUs <= tmax) playhead(g, X(Math.min(tUs, tmax)), T, ph)
   g.textAlign = 'left'
   g.fillStyle = gold(1)
-  g.font = `10px ${MONO}`
+  g.font = `10px ${plot.mono}`
   g.fillText(`peak ${glass.contact.peak_force.toFixed(2)} N`, L, 11)
 }
 
