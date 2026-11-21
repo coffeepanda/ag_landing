@@ -26,7 +26,7 @@ export const EQ_MS = 500
  * Cycles the equations while `active`. Each new one fades in over 120 ms (no exit animation).
  * Reduced motion holds the first equation still. Renders nothing while inactive.
  */
-export default function Equations({ active, className = '' }: { active: boolean; className?: string }) {
+export default function Equations({ active }: { active: boolean }) {
   const [i, setI] = useState(0)
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Equations({ active, className = '' }: { active: boolean;
 
   if (!active) return null
   return (
-    <span className={`eq ${className}`} key={i}>
+    <span className="eq" key={i}>
       {EQUATIONS[i]}
     </span>
   )

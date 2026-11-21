@@ -242,9 +242,6 @@ a.tab:hover { background: var(--agp-hover); }
 }
 .hero.is-open .mystery { opacity: 1; transform: none; }
 .mc-k { color: var(--agp-ink); }
-.mc-c { color: var(--faint); }
-.mc-a { color: var(--live); }
-.mystery-fade .mc-line { display: block; animation: mc-in var(--agp-motion-slow) var(--ease) both; }
 .mc-caret {
   display: inline-block;
   width: 0.55em;
@@ -260,61 +257,12 @@ a.tab:hover { background: var(--agp-hover); }
 .eq { display: inline-block; white-space: nowrap; animation: eq-in var(--agp-motion-fast) var(--ease) both; }
 @keyframes eq-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
 
-/* 1 · In the code: the argument of simulate(…) becomes the law being solved. */
+/* The argument of simulate(…) becomes the law being solved. */
 .mc-s { color: var(--agp-ink); }
-
-/* 2 · Its own line: a larger line under the code, led by the live dot. */
-.mc-after { display: block; margin-top: 0.7em; }
-.eq-line {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  font-family: var(--sans);
-  font-size: 1.55em;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  color: var(--agp-ink);
-}
-.eq-line::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--live);
-  flex: none;
-}
-/* Reserve the extra line so the headline doesn't move when it appears. */
-.stage.eq-line-place .hero { margin-bottom: calc(var(--snip-gap) + 4 * 1.7 * var(--snip-size) + 0.7 * var(--snip-size) + 1.55 * 1.2 * var(--snip-size)); }
-
-/* 3 · On the screen: a large readout in the video's lower left, in the viewport's light ink. */
-/* A soft dark corner under the readout keeps it legible over the bright ring. */
-.stage.eq-screen-place .vignette {
-  background:
-    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(0 0 0 / 0.35) 100%),
-    radial-gradient(ellipse 70% 40% at 0% 100%, rgb(0 0 0 / 0.55), transparent 70%);
-}
-.screen-eq {
-  position: absolute;
-  z-index: 7;
-  left: calc(100vw - var(--edge) - var(--vid-w) + clamp(18px, 2vw, 32px));
-  top: calc(var(--area-top) + (var(--area-h) - var(--vid-h)) / 2 + var(--vid-h) - clamp(18px, 2.4vw, 36px));
-  transform: translateY(-100%);
-  max-width: calc(var(--vid-w) - 2 * clamp(18px, 2vw, 32px));
-  font-family: var(--sans);
-  font-size: clamp(22px, 2.6vw, 44px);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: #ECEBE6;
-  text-shadow: 0 0 24px rgb(0 0 0 / 0.55);
-  pointer-events: none;
-}
-@keyframes mc-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-caret, .mc-caret.is-idle, .eq { animation: none; }
-  .mystery, .mystery-fade .mc-line { transition: none; animation: none; transform: none; }
+  .mystery { transition: none; transform: none; }
 }
 .foot {
   grid-column: 1;
@@ -435,11 +383,9 @@ a.tab:hover { background: var(--agp-hover); }
   }
   .void, .vignette { inset: var(--area-top) var(--edge) auto var(--edge); }
   .hero { grid-row: 1; align-self: start; margin-bottom: 0; }
-  .stage.eq-line-place .hero { margin-bottom: 0; }
-  .screen-eq { left: calc(var(--edge) + 18px); top: calc(var(--area-top) + var(--vid-h) - 18px); max-width: calc(var(--vid-w) - 36px); }
   /* Stacked: the snippet takes its own space under the headline (tap to reveal). */
   .mystery { position: static; margin-top: 18px; max-height: 0; overflow: hidden; transition: opacity var(--agp-motion-base) var(--ease), max-height var(--agp-motion-slow) var(--ease); }
-  .hero.is-open .mystery { max-height: 12em; }
+  .hero.is-open .mystery { max-height: 9em; }
   .title { font-size: clamp(44px, 9vw, 88px); }
   .foot { grid-row: 2; align-self: end; text-align: left; }
 }
@@ -447,51 +393,3 @@ a.tab:hover { background: var(--agp-hover); }
 @media (prefers-reduced-motion: reduce) {
   .live-dot { animation: none; }
 }
-
-/* Prototype switch: a small pill in the middle of the top bar. */
-.proto-switch {
-  position: fixed;
-  z-index: 50;
-  left: 50%;
-  top: 10px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px 3px 2px 10px;
-  background: var(--agp-surface);
-  border: 1px solid var(--agp-line);
-  border-radius: 999px;
-  box-shadow: 0 1px 2px rgb(16 17 20 / 0.06);
-}
-.proto-switch-k { font-size: 11px; font-weight: 600; color: var(--agp-muted); margin-right: 4px; }
-.proto-switch button {
-  position: relative;
-  width: 26px;
-  height: 26px;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: var(--agp-muted);
-  font: 600 12px var(--mono);
-  cursor: pointer;
-}
-.proto-switch button:hover { background: var(--agp-hover); color: var(--agp-ink); }
-.proto-switch button.is-active { background: var(--agp-ink); color: var(--agp-canvas); }
-.proto-switch-name {
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 10px);
-  transform: translateX(-50%);
-  white-space: nowrap;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: var(--agp-ink);
-  color: var(--agp-canvas);
-  font: 500 12px var(--sans);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--agp-motion-fast) var(--ease);
-}
-.proto-switch button:hover .proto-switch-name { opacity: 1; }
-@media (max-width: 720px), (max-aspect-ratio: 4/5) { .proto-switch { display: none; } }

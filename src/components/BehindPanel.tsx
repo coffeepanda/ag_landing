@@ -61,14 +61,14 @@ export const BehindPanel = forwardRef<HTMLElement, Props>(function BehindPanel(
 })
 
 /**
- * Behind the scene starts open on wide screens and closed on phones, where the
- * sheet would cover most of the scene. Once a visitor opens or closes it, that
- * choice holds for every phenomenon and view for the rest of the visit.
+ * Behind the scene starts closed on every screen, so each phenomenon opens clean.
+ * Once a visitor opens or closes it, that choice holds for every phenomenon and
+ * view for the rest of the visit.
  */
 let chosen: boolean | null = null
 
 export function useBehindPanel() {
-  const [open, setOpen] = useState(() => chosen ?? !window.matchMedia('(max-width: 720px)').matches)
+  const [open, setOpen] = useState(() => chosen ?? false)
   const set = useCallback((next: boolean) => {
     chosen = next
     setOpen(next)
