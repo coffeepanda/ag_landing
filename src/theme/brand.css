@@ -255,10 +255,65 @@ a.tab:hover { background: var(--agp-hover); }
 }
 .mc-caret.is-idle { animation: caret 1.1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
+
+/* Equations: one every 0.5 s while the headline is hovered. Each fades in; none fades out. */
+.eq { display: inline-block; white-space: nowrap; animation: eq-in var(--agp-motion-fast) var(--ease) both; }
+@keyframes eq-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+/* 1 · In the code: the argument of simulate(…) becomes the law being solved. */
+.mc-s { color: var(--agp-ink); }
+
+/* 2 · Its own line: a larger line under the code, led by the live dot. */
+.mc-after { display: block; margin-top: 0.7em; }
+.eq-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--sans);
+  font-size: 1.55em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--agp-ink);
+}
+.eq-line::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live);
+  flex: none;
+}
+/* Reserve the extra line so the headline doesn't move when it appears. */
+.stage.eq-line-place .hero { margin-bottom: calc(var(--snip-gap) + 4 * 1.7 * var(--snip-size) + 0.7 * var(--snip-size) + 1.55 * 1.2 * var(--snip-size)); }
+
+/* 3 · On the screen: a large readout in the video's lower left, in the viewport's light ink. */
+/* A soft dark corner under the readout keeps it legible over the bright ring. */
+.stage.eq-screen-place .vignette {
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(0 0 0 / 0.35) 100%),
+    radial-gradient(ellipse 70% 40% at 0% 100%, rgb(0 0 0 / 0.55), transparent 70%);
+}
+.screen-eq {
+  position: absolute;
+  z-index: 7;
+  left: calc(100vw - var(--edge) - var(--vid-w) + clamp(18px, 2vw, 32px));
+  top: calc(var(--area-top) + (var(--area-h) - var(--vid-h)) / 2 + var(--vid-h) - clamp(18px, 2.4vw, 36px));
+  transform: translateY(-100%);
+  max-width: calc(var(--vid-w) - 2 * clamp(18px, 2vw, 32px));
+  font-family: var(--sans);
+  font-size: clamp(22px, 2.6vw, 44px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #ECEBE6;
+  text-shadow: 0 0 24px rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
 @keyframes mc-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-caret, .mc-caret.is-idle { animation: none; }
+  .hero-caret, .mc-caret.is-idle, .eq { animation: none; }
   .mystery, .mystery-fade .mc-line { transition: none; animation: none; transform: none; }
 }
 .foot {
@@ -380,9 +435,11 @@ a.tab:hover { background: var(--agp-hover); }
   }
   .void, .vignette { inset: var(--area-top) var(--edge) auto var(--edge); }
   .hero { grid-row: 1; align-self: start; margin-bottom: 0; }
+  .stage.eq-line-place .hero { margin-bottom: 0; }
+  .screen-eq { left: calc(var(--edge) + 18px); top: calc(var(--area-top) + var(--vid-h) - 18px); max-width: calc(var(--vid-w) - 36px); }
   /* Stacked: the snippet takes its own space under the headline (tap to reveal). */
   .mystery { position: static; margin-top: 18px; max-height: 0; overflow: hidden; transition: opacity var(--agp-motion-base) var(--ease), max-height var(--agp-motion-slow) var(--ease); }
-  .hero.is-open .mystery { max-height: 9em; }
+  .hero.is-open .mystery { max-height: 12em; }
   .title { font-size: clamp(44px, 9vw, 88px); }
   .foot { grid-row: 2; align-self: end; text-align: left; }
 }
