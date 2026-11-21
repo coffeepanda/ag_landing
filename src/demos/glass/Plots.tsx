@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import type { Glass } from './data'
+import { plot } from '../../theme/look'
 
 type Focus = { i: number; tau: number } | null
 
-const GOLD = '217,185,138'
-const INK = '244,239,230'
-const MONO = '"IBM Plex Mono", ui-monospace, monospace'
 const DB_RANGE = 60
 const LIVE_FOR = 7 // s after a strike that plots follow it
 
@@ -123,13 +121,13 @@ function prep(c: HTMLCanvasElement) {
   const g = c.getContext('2d')!
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   g.clearRect(0, 0, w, h)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   g.textBaseline = 'alphabetic'
   return { g, w, h }
 }
 
-const ink = (a: number) => `rgba(${INK},${a})`
-const gold = (a: number) => `rgba(${GOLD},${a})`
+const ink = (a: number) => `rgba(${plot.ink},${a})`
+const gold = (a: number) => `rgba(${plot.accent},${a})`
 
 function hz(f: number) {
   return f >= 1000 ? `${(f / 1000).toFixed(f >= 10000 ? 0 : 1)} kHz` : `${Math.round(f)} Hz`
@@ -177,11 +175,11 @@ function drawSpectrum(c: HTMLCanvasElement, glasses: Glass[], s: Stats, i: numbe
 
   g.textAlign = 'left'
   g.fillStyle = live ? gold(1) : ink(0.55)
-  g.font = `10px ${MONO}`
+  g.font = `10px ${plot.mono}`
   g.fillText(`${glass.note} · ${hz(glass.modes[0]!.f)}`, L, 11)
   g.textAlign = 'right'
   g.fillStyle = ink(0.3)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   g.fillText(`0 to −${DB_RANGE} dB`, w - R, 11)
 }
 
@@ -334,6 +332,6 @@ function drawForce(c: HTMLCanvasElement, glasses: Glass[], us: number[], s: Stat
   const st = s.strikes[i]!
   g.textAlign = 'left'
   g.fillStyle = live ? gold(1) : ink(0.55)
-  g.font = `10px ${MONO}`
+  g.font = `10px ${plot.mono}`
   g.fillText(`peak ${st.peak.toFixed(2)} N · ${Math.round(st.duration)} µs`, L, 11)
 }

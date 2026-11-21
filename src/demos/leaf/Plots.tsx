@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import type { LeafBundle } from './data'
+import { plot } from '../../theme/look'
 
-const GOLD = '217,185,138'
-const INK = '244,239,230'
-const MONO = '"IBM Plex Mono", ui-monospace, monospace'
-const ink = (a: number) => `rgba(${INK},${a})`
-const gold = (a: number) => `rgba(${GOLD},${a})`
+const ink = (a: number) => `rgba(${plot.ink},${a})`
+const gold = (a: number) => `rgba(${plot.accent},${a})`
 
 type Series = { v: Float32Array; color: (a: number) => string; dash?: number[]; label: string }
 
@@ -168,7 +166,7 @@ function prep(c: HTMLCanvasElement) {
   const g = c.getContext('2d')!
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   g.clearRect(0, 0, w, h)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   return { g, w, h }
 }
 
@@ -213,7 +211,7 @@ function drawPath(c: HTMLCanvasElement, d: Derived, t: number) {
 
   g.textAlign = 'left'
   g.fillStyle = gold(1)
-  g.font = `10px ${MONO}`
+  g.font = `10px ${plot.mono}`
   g.fillText(`${t.toFixed(2)} s · ${d.height[k]!.toFixed(2)} m`, L + 6, T + 10)
 }
 
@@ -255,7 +253,7 @@ function drawSeries(c: HTMLCanvasElement, d: Derived, t: number, series: Series[
 
   // Legend with current values
   g.textAlign = 'left'
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   let lx = L
   for (const s of series) {
     const txt = `${s.label} ${s.v[k]!.toFixed(unit === '°' ? 0 : 2)}${unit === '°' ? '°' : ''}`

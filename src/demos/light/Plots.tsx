@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Figure } from '../../components/BehindPanel'
 import { css, orderAngle, type Room } from './data'
+import { plot } from '../../theme/look'
 
-const INK = '244,239,230'
-const MONO = '"IBM Plex Mono", ui-monospace, monospace'
-const ink = (a: number) => `rgba(${INK},${a})`
+const ink = (a: number) => `rgba(${plot.ink},${a})`
 
 function prep(c: HTMLCanvasElement) {
   const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -14,7 +13,7 @@ function prep(c: HTMLCanvasElement) {
   const g = c.getContext('2d')!
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   g.clearRect(0, 0, w, h)
-  g.font = `9px ${MONO}`
+  g.font = `9px ${plot.mono}`
   return { g, w, h }
 }
 
@@ -194,7 +193,7 @@ function drawBudget(c: HTMLCanvasElement, b: Budget) {
     g.fillText(label, L - 8, y)
     const bw = (watts / b.input) * (w - L - R)
     const back = label.startsWith('back')
-    g.fillStyle = back ? ink(0.25) : 'rgba(217,185,138,0.85)'
+    g.fillStyle = back ? ink(0.25) : `rgba(${plot.accent},0.85)`
     g.fillRect(L, y - 5, Math.max(1, bw), 10)
     g.textAlign = 'left'
     g.fillStyle = ink(0.7)
@@ -268,8 +267,8 @@ function drawSpectrum(c: HTMLCanvasElement, room: Room, sel: number | null) {
   const T1 = (e: { orders: number[]; T: number[] }) => (e.T[e.orders.indexOf(1)] ?? 0) + (e.T[e.orders.indexOf(-1)] ?? 0)
   series(0, T0, ink(0.85), [])
   series(1, T0, ink(0.85), [3, 3])
-  series(0, T1, 'rgba(217,185,138,1)', [])
-  series(1, T1, 'rgba(217,185,138,1)', [3, 3])
+  series(0, T1, `rgba(${plot.accent},1)`, [])
+  series(1, T1, `rgba(${plot.accent},1)`, [3, 3])
   g.setLineDash([])
   room.bands.forEach((b, i) => {
     const on = sel === null || sel === i
@@ -278,5 +277,5 @@ function drawSpectrum(c: HTMLCanvasElement, room: Room, sel: number | null) {
   })
   g.textAlign = 'left'
   g.fillStyle = ink(0.85); g.fillText('straight through', L, 10)
-  g.fillStyle = 'rgba(217,185,138,1)'; g.fillText('first bend (both sides)', L + 104, 10)
+  g.fillStyle = `rgba(${plot.accent},1)`; g.fillText('first bend (both sides)', L + 104, 10)
 }
