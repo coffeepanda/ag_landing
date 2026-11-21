@@ -157,17 +157,29 @@ a.tab:hover { background: var(--agp-hover); }
 
 /* ---------- Home: headline on paper, the video in the viewport ---------- */
 
+/*
+ * The video keeps its own 16:9 shape, the largest that fits the right column between the
+ * bar and the footer line, so nothing is cropped and it never crosses the page's bottom edge.
+ * The stage is the viewport, so the sizes come from viewport units.
+ */
 .stage {
-  padding: calc(var(--bar-h) + var(--edge)) var(--edge) var(--edge);
+  --col-gap: clamp(24px, 4vw, 64px);
+  --area-top: calc(var(--bar-h) + var(--edge));
+  --area-w: calc((100vw - 2 * var(--edge) - var(--col-gap)) * 7 / 12);
+  --area-h: calc(100svh - var(--bar-h) - 2 * var(--edge));
+  --vid-w: min(var(--area-w), var(--area-h) * 16 / 9);
+  --vid-h: min(var(--area-h), var(--area-w) * 9 / 16);
+  padding: var(--area-top) var(--edge) var(--edge);
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   grid-template-rows: 1fr auto;
-  column-gap: clamp(24px, 4vw, 64px);
+  column-gap: var(--col-gap);
 }
+/* Centred on the column's height, so the headline (also centred) reads level with it. */
 .void,
 .vignette {
-  inset: calc(var(--bar-h) + var(--edge)) var(--edge) var(--edge) auto;
-  width: calc((100% - 2 * var(--edge) - clamp(24px, 4vw, 64px)) * 7 / 12);
-  height: calc(100% - var(--bar-h) - 2 * var(--edge));
+  inset: calc(var(--area-top) + (var(--area-h) - var(--vid-h)) / 2) var(--edge) auto auto;
+  width: var(--vid-w);
+  height: var(--vid-h);
 }
 .vignette { background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(0 0 0 / 0.35) 100%); }
 .title {
@@ -183,6 +195,7 @@ a.tab:hover { background: var(--agp-hover); }
 .foot {
   grid-column: 1;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   font-family: var(--sans);
   font-size: 12.5px;
@@ -273,11 +286,6 @@ a.tab:hover { background: var(--agp-hover); }
   .tab::after { bottom: 0; left: 8px; right: 8px; }
   a.tab:hover { background: none; }
 
-  .stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; padding-top: calc(var(--bar-h) + var(--edge) + 52svh + 22px); }
-  .void, .vignette { width: auto; left: var(--edge); height: 52svh; bottom: auto; }
-  .title { grid-row: 1; align-self: start; font-size: clamp(44px, 13vw, 64px); }
-  .foot { grid-row: 2; align-self: end; align-items: flex-start; text-align: left; }
-
   .strip { top: calc(var(--bar-h) + 12px); left: var(--edge); right: auto; }
   .demo-copy { top: calc(var(--bar-h) + 56px); max-width: calc(100% - 2 * var(--edge)); }
   .demo-title { font-size: 25px; }
@@ -288,6 +296,22 @@ a.tab:hover { background: var(--agp-hover); }
   .demo-controls { left: 10px; right: 10px; bottom: 10px; }
   .behind { top: auto; left: 0; right: 0; bottom: 0; width: auto; border-radius: var(--agp-radius-lg) var(--agp-radius-lg) 0 0; }
   .demo-stage:has(.behind.is-open) .demo-controls { left: 0; right: 0; bottom: 0; }
+}
+
+/* Phones and portrait screens: the video on top, full width, the headline under it.
+ * Here the frame is taller than 16:9 on purpose (a cinematic crop), but never more than
+ * 56% of the screen, so the headline and footer always fit below it. */
+@media (max-width: 720px), (max-aspect-ratio: 4/5) {
+  .stage {
+    --vid-w: calc(100vw - 2 * var(--edge));
+    --vid-h: min(56svh, max(var(--vid-w) * 9 / 16, 44svh));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    padding-top: calc(var(--area-top) + var(--vid-h) + 24px);
+  }
+  .void, .vignette { inset: var(--area-top) var(--edge) auto var(--edge); }
+  .title { grid-row: 1; align-self: start; font-size: clamp(44px, 9vw, 88px); }
+  .foot { grid-row: 2; align-self: end; text-align: left; }
 }
 
 @media (prefers-reduced-motion: reduce) {
