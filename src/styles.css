@@ -140,8 +140,6 @@ a.tab:hover { color: var(--ink); }
 .title, .foot { position: relative; z-index: 1; }
 
 .title {
-  align-self: center;
-  justify-self: center;
   text-align: center;
   font-family: var(--sans);
   font-weight: 300;
